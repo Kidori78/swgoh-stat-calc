@@ -424,7 +424,7 @@ The *Default* explanations below are what is used when the related flag(s) are n
 
 
 ### Calculation control ###
-`calcGP: true`\ 
+`calcGP: true`\
 Adds the gp property to the unit object with the correct Galactic Power.
 Only works in .calcRosterStats, .calcPlayerStats, and .getMaxValueUnits.
 
@@ -491,11 +491,12 @@ Uses the decimal form (i.e. 10% is returned as 0.1)\
 *Default* - return the flat values for above stats.
 
 `scaled: true` / `unscaled: true`\
-Matches scaling status of values used internally to the game (as seen in portions of [swgoh.help's](http://api.swgoh.help) `/data` endpoint).\
+Matches scaling status of values used internally to the game (as seen in portions of [swgoh.help's](http://api.swgoh.help) `/data` endpoint).
 >`scaled` - multiplies all values by 10,000.  All non-modded stats should be integers at this scale.\
 `unscaled` - multiplies all values by 100,000,000.  All stats (including mods) fit as integers at this scale.\
 *Default* - Stats returned at the expected scale as seen in-game.  Non-percent stats (like Speed) should be integers, all percent stats (like Potency) will be decimals
-\[top](/README.md#table-of-contents)
+
+[top](/README.md#table-of-contents)
 
 
 ### Stats Object Control ###
@@ -514,15 +515,15 @@ Activates the `percentVals` flag above, and also changes the Stats Object to hav
 >`gear` *characters* - Amount of stat granted by currently equipped gear (and unused within mod calculations).\
 >`mods` *characters* - Amount of stat granted by mods.\
 >`crew` *ships* - Amount of stat granted by crew rating.
-\[top](/README.md#table-of-contents)
+
+[top](/README.md#table-of-contents)
 
 
 ### Stat Naming Control ###
 
 `language: {Object}`\
-Tells the calculator to rename the stats using the submitted object.
-Used mostly for localization.
-*Object* must be such that `options.language[ statID ]` is the stat name, i.e. `{"1": "Health",...}`.\
+Tells the calculator to rename the stats using the submitted object. Used mostly for localization.\
+*Object* must be such that `options.language[ statID ]` is the stat name, i.e. `{"1": "Health",...}`.
 ```js
 {
    "1": "Health",
@@ -570,7 +571,8 @@ Any statIDs that are not in `options.language` will remain indexed as that integ
 Converts any stat name strings used in the `language` option into standard camelCase with no spaces.
 Only affects stat names defined in that parameter.\
 I.e. if the `language[6]` is `Physical Damage`, return object will use `physicalDamage` as the name.
-\[top](/README.md#table-of-contents)
+
+[top](/README.md#table-of-contents)
 
 
 ## Object Formats ##
@@ -627,9 +629,10 @@ Used directly by `.calcPlayerStats()`, which also accepts an array of these obje
 **player.roster**\
 Used directly by `.calcRosterStats()`
 
-**Unit**  *single element of* `player.roster`\
+**Unit**  *single element of* `player.roster`
 Used directly by `.calcCharStats()` and `.calcShipStats()` (for both the ship and the crew members).
-\[top](/README.md#table-of-contents)
+
+[top](/README.md#table-of-contents)
 
 # Changelog #
 * Version 1.0.0
