@@ -3,6 +3,7 @@
 A class that calculates unit stats for EA's Star Wars: Galaxy of Heroes based on player data or global unit builds.
 Accepted data formats are those found in [swgoh.help's API](http://api.swgoh.help) endpoints, specifically the 'player.roster' object from their `/player` endpoint. Examples given use [swgoh-help-api Client Wrapper by PopGoesTheWza](https://github.com/PopGoesTheWza/swgoh-help-api) to get the data from the SWGOH.HELP API.
 
+
 ## Setup ##
 Create a new script file in your Google App Script project and then copy and paste the statCalculator.gs file to it. This file uses ES6 so you must set your Google App Script project to utilize the V8 runtime, for instructions on how to do that check [developers.google.com](https://developers.google.com/apps-script/guides/v8-runtime#enabling_the_v8_runtime). 
 
@@ -11,6 +12,7 @@ Create a new script file in your Google App Script project and then copy and pas
 const statCalculator = new StatCalculator();
 statCalculator.setGameData();
 ```
+
 
 ## Methods ##
 
@@ -27,6 +29,7 @@ To create the object from [swgoh.help's](http://api.swgoh.help) `/data` endpoint
 const statCalculator = new StatCalculator();
 statCalculator.setGameData();
 ```
+
 
 ### .setMaxValues(newValues) ###
 
@@ -48,6 +51,7 @@ The object containing the new value to set for the specified key(s).
   modTier:: <integer>    // Color of the mod, represented by the letter A(5) to E(1) in the name of the mod
 }  
 ```
+
 
 ### .getMaxValueUnits(options) ###
 
@@ -96,6 +100,7 @@ Only one true: `ships:true` or `char:true`
 }
 ```
 
+
 ### .calcCharStats(char [,options] ) ###
 
 Calculates stats for a single character.
@@ -140,6 +145,7 @@ let char = player.roster.find( unit => unit.defId == "DARTHSION" );
 // get stats
 char.stats = statCalculator.calcCharStats( char );
 ```
+
 
 ### .calcShipStats(ship, crew [,options] ) ###
 
@@ -192,6 +198,7 @@ let crew = player.roster.find( unit => unit.defId == "BOSSK" );
 ship.stats = statCalculator.calcShipStats( ship, [crew] );
 ```
 
+
 ### .calcRosterStats(units [, options] ) ###
 
 Goes through a players entire roster and calls `.calcCharStats()` or `.calcShipStats()` depending on each unit's `combatType`.
@@ -236,6 +243,7 @@ The original `units` array has been altered such that each element now has a `.s
 // get stats for full roster
 let count = statCalculator.calcRosterStats( player.roster );
 ```
+
 
 ### .calcPlayerStats(players [, options] ) ###
 
@@ -282,6 +290,7 @@ The original `players` object/array has been altered such that each unit in each
 let count = statCalculator.calcPlayerStats( player );
 ```
 
+
 ### .calcCharGP(char [,options]) ###
 
 Calculates galactic power for a single character.
@@ -326,6 +335,7 @@ let char = player.roster.find( unit => unit.defId == "DARTHSION" );
 // get gp
 char.gp = statCalculator.calcCharGP( char );
 ```
+
 
 ### .calcShipGP(ship, crew [, options]) ###
 
@@ -374,6 +384,7 @@ let crew = player.roster.find( unit => unit.defId == "BOSSK" );
 ship.gp = statCalculator.calcShipGP( ship, [crew] );
 ```
 
+
 ## Options ##
 
 The `options` parameter of all calculation methods is an object that can contain any of the following properties.
@@ -383,6 +394,7 @@ The *Default* explanations below are what is used when the related flag(s) are n
 ```js
 { gameStyle: true, unscaled: true }
 ```
+
 
 ### Calculation control ###
 `calcGP: true`\ 
@@ -442,6 +454,7 @@ Parameters provided here can be missing in the original unit.
 *Default* - uses the values defined by the unit objects submitted.\
 This applies to each individual property of the `useValues` object, not just the option as a whole.
 
+
 ### Value control ###
 
 `percentVals: true`\
@@ -454,6 +467,7 @@ Matches scaling status of values used internally to the game (as seen in portion
 >`scaled` - multiplies all values by 10,000.  All non-modded stats should be integers at this scale.\
 `unscaled` - multiplies all values by 100,000,000.  All stats (including mods) fit as integers at this scale.\
 *Default* - Stats returned at the expected scale as seen in-game.  Non-percent stats (like Speed) should be integers, all percent stats (like Potency) will be decimals
+
 
 ### Stats Object Style ###
 
@@ -471,6 +485,7 @@ Activates the `percentVals` flag above, and also changes the Stats Object to hav
 >`gear` *characters* - Amount of stat granted by currently equipped gear (and unused within mod calculations).\
 >`mods` *characters* - Amount of stat granted by mods.\
 >`crew` *ships* - Amount of stat granted by crew rating.
+
 
 ### Stat Naming Options ###
 
@@ -526,6 +541,7 @@ Any statIDs that are not in `options.language` will remain indexed as that integ
 Converts any stat name strings used in the `language` option into standard camelCase with no spaces.
 Only affects stat names defined in that parameter.\
 I.e. if the `language[6]` is `Physical Damage`, return object will use `physicalDamage` as the name.
+
 
 ## Object Formats ##
 
