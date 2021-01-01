@@ -1,64 +1,102 @@
-# SWGOH Stat Calculator Readme #
+# SWGOH Stat Calculator for GAS Readme #
 
-Calculates unit stats for EA's Star Wars: Galaxy of Heroes based on player data.
-Accepted data formats are those found in [swgoh.help's API](http://api.swgoh.help) endpoints, specifically the 'player.roster' object from their `/player` endpoint.
+A class that calculates unit stats for EA's Star Wars: Galaxy of Heroes based on player data or global unit builds.
+Accepted data formats are those found in [swgoh.help's API](http://api.swgoh.help) endpoints, specifically the 'player.roster' object from their `/player` endpoint. Examples given use [swgoh-help-api Client Wrapper by PopGoesTheWza](https://github.com/PopGoesTheWza/swgoh-help-api) to get the data from the SWGOH.HELP API.
 
 ## Setup ##
-
-### Node.js ###
-
-#### Installation ####
-`npm install swgoh-stat-calc`
+Create a new script file in your Google App Script project and then copy and paste the statCalculator.gs file to it. This file uses ES6 so you must set your Google App Script project to utilize the V8 runtime, for instructions on how to do that check [developers.google.com](https://developers.google.com/apps-script/guides/v8-runtime#enabling_the_v8_runtime). 
 
 #### Initialization ####
 ```js
-const statCalculator = require('swgoh-stat-calc');
-statCalculator.setGameData( gameData );
-```
-
-### Raw JavaScript ###
-The `statCalculator.js` file is the complete calculator object, and has no dependencies on Node-specific packages.
-It can run just as well in any browser/system with at least ES6 compatibility.
-If used outside of npm, copy that file to a location your project can access, and adjust the `require()` parameter to point to that file, such as:
-```js
-const statCalculator = require('./statCalculator.js');
+const statCalculator = new StatCalculator();
+statCalculator.setGameData();
 ```
 
 ## Methods ##
 
-Examples below make use of the [api-swgoh-help](https://github.com/r3volved/api-swgoh-help/tree/node) package (loaded into variable `swapi`) to collect the raw data.
-See it's documentation to learn more about how to use it to gather this data.
+### .setGameData() ###
 
-### .setGameData(gameData) ###
-
-Tells the Stat Calculator what to use for the base Game Data.
-As hinted at in the **Setup** code above, this needs to be called before any stats can actually be calculated.
-Can also be used later to update / reassign the game data, if an update is detected and loaded externally.
-
-#### Paramters ####
-
-`gameData` *Object*\
-The Obect used by the Stat Calculator to read raw game data.  It requires a specific format.
-An example JSON file of the proper `gameData` object can be found [here](https://swgoh-stat-calc.glitch.me/gameData.json).
+Sets the needed data object for calculating all galactic power and stats by fetching it from https://swgoh-stat-calc.glitch.me/gameData.json and applying them to the classes properties.
+As hinted at in the **Setup** code above, this needs to be called before any other methods can be used.
 That link should remain active and updated, and thus can be used directly to create the data object.
 To create the object from [swgoh.help's](http://api.swgoh.help) `/data` endpoint, see the code in [dataBuilder.js](https://glitch.com/edit/#!/swgoh-stat-calc?path=statCalc/dataBuilder.js). (A separate package for this code will be created in the future, but for now, it's just hiding in that project).
-
-#### Return Value ####
-
-None.
 
 #### Example ####
 
 ```js
-// uses 'node-fetch' for the GET request to retrieve the gameData object
-const fetch = require('node-fetch');
-const statCalculator = require('swgoh-stat-calc');
-
-let gameData = await (await fetch('https://swgoh-stat-calc.glitch.me/gameData.json')).json();
-statCalculator.setGameData( gameData );
+const statCalculator = new StatCalculator();
+statCalculator.setGameData();
 ```
 
-### .calcCharStats(char [, flags, options] ) ###
+### .setMaxValues(newValues) ###
+
+Changes the set values in the maxValue property for the class. 
+This property is currently only used with the .getMaxValueUnits Method.
+
+#### Parameters ####
+
+`newValues` *Object*\
+The object containing the new value to set for the specified key(s).
+```js
+{
+  rarity: <integer>,     // Unit Rarity/Stars
+  level: <integer>,      // Unit Level
+  gear: <integer>,       // Character Gear Level
+  relic: <integer>,      // In-game Relic Level + 2, 1 = locked, 2 = unlocked, 3 = Level 1
+  modRarity: <integer>,  // Dots of the mod, represented by a roman numeral in the name of the mod
+  modLevel: <integer>,   // Level of the mod
+  modTier:: <integer>    // Color of the mod, represented by the letter A(5) to E(1) in the name of the mod
+}  
+```
+
+### .getMaxValueUnits(options) ###
+
+Calculates stats for all ships and/or characters based on the *maxValues* property and returns it as an object.
+Allows for customizing the object returned including stat calculations and adding gp.
+
+#### Parameters ####
+
+`options` *Object*\
+The object containing flags for indicating what unit type you want to return and options for the calculations.
+```js
+{
+  char: <bool>,            // true returns all characters with specified calculations
+  ship: <bool>,            // true returns all ships with specified calculations
+  gpIncludeMods: <bool>,   // OPTIONAL: true returns galactic power with mod ratings included, must use with calcGP
+  calcOptions: {           // OPTIONAL: for setting calculation options
+                 gameStyle: <bool>,   // true returns final stats and activates percentVals, see `Options` below for a breakdown
+                 calcGP: <bool>       // true adds gp to each unit object
+                 percentVals: <bool>  // true returns percent values for stats using ratings, see `Options` below for a breakdown
+                 language: {Object}   // Changes the key for stat values from an integer to a named value, see `Options` below for a breakdown
+  }
+}
+```
+
+#### Return Value ####
+
+An object with the games full roster for the specified type(s).
+Both true: `ships:true, char:true`
+```js
+{
+  character: {
+               BASEID: {object},  // Roster object including .stats
+               ...
+             }
+  ship: {
+          BASEID: {object},      // Roster object including .stats
+          ...
+        }
+}
+```
+Only one true: `ships:true` or `char:true`
+```js
+{
+  BASEID: {object},  // Roster object including .stats
+  ...
+}
+```
+
+### .calcCharStats(char [,options] ) ###
 
 Calculates stats for a single character.
 
@@ -67,45 +105,43 @@ Calculates stats for a single character.
 `char` *Object*\
 The character object to calculate stats for.  Only a single character is allowed.  See `Object Formats` below for more info.
 
-`flags` *Object* `| Optional`\
-Optional stat format flags.  See `Flags` below for a list of accepted flags.
-
 `options` *Object* `| Optional`\
-Optional stat format instructions more complex than `flags`.  See `Options` below for a breakdown.
+Optional adjustments to various aspects of the calculations and returned object.  See `Options` below for a breakdown.
 
 #### Return Value ####
 
-The `stats` object for the given `char`.  Does not affect `char` itself.
+Adds .stats object to the character object given.
 
 #### Example ####
 
 ```js
 // get Player roster from api.swgoh.help
-let player = (await swapi.fetchPlayer({
+ const client = new swgohhelpapi.exports.Client(this.settings);
+ let player = client.fetchPlayer({
   allycode: 231686213,
   language: "ENG_US",
   project: {
     roster: {
-      defId: 1,
-      nameKey: 1,
-      rarity: 1,
-      level: 1,
-      gear: 1,
-      equipped: 1,
-      combatType: 1,
-      skills: 1,
-      mods: 1,
-      relic: 1
+      defId: true,
+      nameKey: true,
+      rarity: true,
+      level: true,
+      gear: true,
+      equipped: true,
+      combatType: true,
+      skills: true,
+      mods: true,
+      relic: true
     }
   }
-}) ).result[0];
+});
 // pull Darth Sion out of roster as an example
 let char = player.roster.find( unit => unit.defId == "DARTHSION" );
 // get stats
 char.stats = statCalculator.calcCharStats( char );
 ```
 
-### .calcShipStats(ship, crew [, flags, options] ) ###
+### .calcShipStats(ship, crew [,options] ) ###
 
 Calculates stats for a single ship.
 
@@ -117,60 +153,56 @@ The ship object to calculate stats for.  Only a single character is allowed.  Se
 `crew` *Array*\
 Array of crew members belonging to the ship.  Each element is regular character object.  See `Object Formats` below for more info.
 
-`flags` *Object* `| Optional`\
-Optional stat format flags.  See `Flags` below for a list of accepted flags.
-
 `options` *Object* `| Optional`\
-Optional stat format instructions more complex than `flags`.  See `Options` below for a breakdown.
+Optional adjustments to various aspects of the calculations and returned object.  See `Options` below for a breakdown.
 
 #### Return Value ####
 
-The `stats` object for the given `ship`.  Does not affect `ship` itself.
+Adds .stats object to the ship object given.
 
 #### Example ####
 
 ```js
 // get Player roster from api.swgoh.help
-let player = (await swapi.fetchPlayer({
+ const client = new swgohhelpapi.exports.Client(this.settings);
+ let player = client.fetchPlayer({
   allycode: 231686213,
   language: "ENG_US",
   project: {
     roster: {
-      defId: 1,
-      nameKey: 1,
-      rarity: 1,
-      level: 1,
-      gear: 1,
-      equipped: 1,
-      combatType: 1,
-      skills: 1,
-      mods: 1,
-      relic: 1
+      defId: true,
+      nameKey: true,
+      rarity: true,
+      level: true,
+      gear: true,
+      equipped: true,
+      combatType: true,
+      skills: true,
+      mods: true,
+      relic: true,
+      crew: true
     }
   }
-}) ).result[0];
+});
 // pulls Hound's Tooth out of roster as an example
 let ship = player.roster.find( unit => unit.defId == "HOUNDSTOOTH" );
 // pulls Bossk out of roster for example crew
 let crew = player.roster.find( unit => unit.defId == "BOSSK" );
 // get stats
-ship.stats = statCalculator.calcCharStats( ship, [crew] );
+ship.stats = statCalculator.calcShipStats( ship, [crew] );
 ```
 
-### .calcRosterStats(units [, flags, options] ) ###
+### .calcRosterStats(units [, options] ) ###
 
-Calls `.calcCharStats()` or `.calcShipStats()` depending on each unit's `combatType` in a roster.
+Goes through a players entire roster and calls `.calcCharStats()` or `.calcShipStats()` depending on each unit's `combatType`.
 
 #### Parameters ####
 
 `units` *Array*\
 Array of unit objects to calculate stats for.  Each element is regular unit object.  See `Object Formats` below for more info.
 
-`flags` *Object* `| Optional`\
-Optional stat format flags.  See `Flags` below for a list of accepted flags.
-
 `options` *Object* `| Optional`\
-Optional stat format instructions more complex than `flags`.  See `Options` below for a breakdown.
+Optional adjustments to various aspects of the calculations and returned object.  See `Options` below for a breakdown.
 
 #### Return Value ####
 
@@ -181,29 +213,31 @@ The original `units` array has been altered such that each element now has a `.s
 
 ```js
 // get Player roster from api.swgoh.help
-let player = (await swapi.fetchPlayer({
+ const client = new swgohhelpapi.exports.Client(this.settings);
+ let player = client.fetchPlayer({
   allycode: 231686213,
   language: "ENG_US",
   project: {
     roster: {
-      defId: 1,
-      nameKey: 1,
-      rarity: 1,
-      level: 1,
-      gear: 1,
-      equipped: 1,
-      combatType: 1,
-      skills: 1,
-      mods: 1,
-      relic: 1
+      defId: true,
+      nameKey: true,
+      rarity: true,
+      level: true,
+      gear: true,
+      equipped: true,
+      combatType: true,
+      skills: true,
+      mods: true,
+      relic: true,
+      crew: true
     }
   }
-}) ).result[0];
+});
 // get stats for full roster
 let count = statCalculator.calcRosterStats( player.roster );
 ```
 
-### .calcPlayerStats(players [, flags, options] ) ###
+### .calcPlayerStats(players [, options] ) ###
 
 Calls `.calcRosterStats()` for each roster object in the player profile(s) submitted.
 
@@ -212,11 +246,8 @@ Calls `.calcRosterStats()` for each roster object in the player profile(s) submi
 `players` *Object* or *Array*\
 Full player profile(s).  Either a single player or an array of players is accepted.  See `Object Formats` below for more info.
 
-`flags` *Object* `| Optional`\
-Optional stat format flags.  See `Flags` below for a list of accepted flags.
-
 `options` *Object* `| Optional`\
-Optional stat format instructions more complex than `flags`.  See `Options` below for a breakdown.
+Optional adjustments to various aspects of the calculations and returned object.  See `Options` below for a breakdown.
 
 #### Return Value ####
 
@@ -227,32 +258,125 @@ The original `players` object/array has been altered such that each unit in each
 
 ```js
 // get Player roster from api.swgoh.help
-let player = (await swapi.fetchPlayer({
+ const client = new swgohhelpapi.exports.Client(this.settings);
+ let player = client.fetchPlayer({
   allycode: 231686213,
   language: "ENG_US",
   project: {
     roster: {
-      defId: 1,
-      nameKey: 1,
-      rarity: 1,
-      level: 1,
-      gear: 1,
-      equipped: 1,
-      combatType: 1,
-      skills: 1,
-      mods: 1,
-      relic: 1
+      defId: true,
+      nameKey: true,
+      rarity: true,
+      level: true,
+      gear: true,
+      equipped: true,
+      combatType: true,
+      skills: true,
+      mods: true,
+      relic: true,
+      crew: true
     }
   }
-}) ).result[0];
+});
 // get stats for full roster
 let count = statCalculator.calcPlayerStats( player );
+```
+
+### .calcCharGP(char [,options]) ###
+
+Calculates galactic power for a single character.
+
+#### Parameters ####
+
+`char` *Object*\
+The character object to calculate gp for.  Only a single character is allowed.  See `Object Formats` below for more info.
+
+`options` *Object* `| Optional`\
+Optional adjustments to various aspects of the calculations and returned object.  See `Options` below for a breakdown.
+
+#### Return Value ####
+
+The `gp` object for the given character.
+
+#### Example ####
+
+```js
+// get Player roster from api.swgoh.help
+ const client = new swgohhelpapi.exports.Client(this.settings);
+ let player = client.fetchPlayer({
+  allycode: 231686213,
+  language: "ENG_US",
+  project: {
+    roster: {
+      defId: true,
+      nameKey: true,
+      rarity: true,
+      level: true,
+      gear: true,
+      equipped: true,
+      combatType: true,
+      skills: true,
+      mods: true,
+      relic: true
+    }
+  }
+});
+// pull Darth Sion out of roster as an example
+let char = player.roster.find( unit => unit.defId == "DARTHSION" );
+// get gp
+char.gp = statCalculator.calcCharGP( char );
+```
+
+### .calcShipGP(ship, crew [, options]) ###
+
+Calculates galactic power for a single ship.
+
+#### Parameters ####
+
+`ship` *Object*\
+The character object to calculate gp for.  Only a single character is allowed.  See `Object Formats` below for more info.
+
+`options` *Object* `| Optional`\
+Optional adjustments to various aspects of the calculations and returned object.  See `Options` below for a breakdown.
+
+#### Return Value ####
+
+The `gp` object for the given ship.
+
+#### Example ####
+
+```js
+// get Player roster from api.swgoh.help
+ const client = new swgohhelpapi.exports.Client(this.settings);
+ let player = client.fetchPlayer({
+  allycode: 231686213,
+  language: "ENG_US",
+  project: {
+    roster: {
+      defId: true,
+      nameKey: true,
+      rarity: true,
+      level: true,
+      gear: true,
+      equipped: true,
+      combatType: true,
+      skills: true,
+      mods: true,
+      relic: true
+    }
+  }
+});
+// pulls Hound's Tooth out of roster as an example
+let ship = player.roster.find( unit => unit.defId == "HOUNDSTOOTH" );
+// pulls Bossk out of roster for example crew
+let crew = player.roster.find( unit => unit.defId == "BOSSK" );
+// get gp
+ship.gp = statCalculator.calcShipGP( ship, [crew] );
 ```
 
 ## Options ##
 
 The `options` parameter of all calculation methods is an object that can contain any of the following properties.
-Any additional properties of the object will be ignored.\
 The *Default* explanations below are what is used when the related flag(s) are not used.
 
 #### Example ####
@@ -261,6 +385,9 @@ The *Default* explanations below are what is used when the related flag(s) are n
 ```
 
 ### Calculation control ###
+`calcGP: true`\ 
+Adds the gp property to the unit object with the correct Galactic Power.
+Only works in .calcRosterStats, .calcPlayerStats, and .getMaxValueUnits.
 
 `withoutModCalc: true`\
 Speeds up character calculations by ignoring stats from mods.\
@@ -315,7 +442,6 @@ Parameters provided here can be missing in the original unit.
 *Default* - uses the values defined by the unit objects submitted.\
 This applies to each individual property of the `useValues` object, not just the option as a whole.
 
-
 ### Value control ###
 
 `percentVals: true`\
@@ -346,16 +472,51 @@ Activates the `percentVals` flag above, and also changes the Stats Object to hav
 >`mods` *characters* - Amount of stat granted by mods.\
 >`crew` *ships* - Amount of stat granted by crew rating.
 
-
 ### Stat Naming Options ###
 
 `language: {Object}`\
 Tells the calculator to rename the stats using the submitted object.
 Used mostly for localization.
 *Object* must be such that `options.language[ statID ]` is the stat name, i.e. `{"1": "Health",...}`.\
-An example English localization can be seen [here](https://swgoh-stat-calc.glitch.me/lang/eng_us.json).\
-Note that a large enough array will also work, as can be seen [here](https://swgoh-stat-calc.glitch.me/lang/statEnum.json).
-
+```js
+{
+   "1": "Health",
+   "2": "Strength (STR)",
+   "3": "Agility (AGI)",
+   "4": "Tactics (TAC)",
+   "5": "Speed",
+   "6": "Physical Damage",
+   "7": "Special Damage",
+   "8": "Armor",
+   "9": "Resistance",
+   "10": "Armor Penetration",
+   "11": "Resistance Penetration",
+   "12": "Dodge Chance",
+   "13": "Deflection Chance",
+   "14": "Physical Critical Rating",
+   "15": "Special Critical Rating",
+   "16": "Critical Damage",
+   "17": "Potency",
+   "18": "Tenacity",
+   "27": "Health Steal",
+   "28": "Protection",
+   "37": "Physical Accuracy",
+   "38": "Special Accuracy",
+   "39": "Physical Critical Avoidance",
+   "40": "Special Critical Avoidance"
+   
+   //The following stats are used only for mod calculations and are not usually displayed in the stats object. They are listed here for reference only.
+   "41": "Offense"
+   "42": "Defense"
+   "48": "Offense Percent"
+   "49": "Defense Percent"
+   "52": "Accuracy Percent"
+   "53": "Critical Chance Percent"
+   "54": "Critical Avoidance Percent"
+   "55": "Health Percent"
+   "56": "Protection Percent"
+}
+```
 **Note on `language` keys:** The object/array for `options.language` does not need to be as complete as the above examples
 (which cover all 60 possible stats in game code).  Some statIDs that exist in game code are not used (such as id 59 - "UnitStat_Taunt"),
 and even more are not returned by this API (such as id 57 - "Speed %" - which converted to the flat "Speed" value, id 5).\
@@ -423,44 +584,6 @@ Used directly by `.calcRosterStats()`
 **Unit**  *single element of* `player.roster`\
 Used directly by `.calcCharStats()` and `.calcShipStats()` (for both the ship and the crew members).
 
-### "*Units*" format -- [swgoh.help's](http://api.swgoh.help) `/units` ###
-
-Object indexed by unit's base ID.  Each such property is an array of unit objects.
-
-**Full Object:**
-```js
-{
-  <BaseID>: [
-    {
-      starLevel: <Integer>,
-      level: <Integer>,
-      gearLevel: <Integer>,
-      gear: [ <String>, ... ],
-      mods: [
-        {
-          set: <Integer>,
-          level: <Integer>,
-          stat: [
-            [ <Integer>, <Number> ],
-          ... ]
-        }
-      ... ]
-    },
-  ... ],
-  <BaseID>: [ ... ],
-... }
-```
-Only allowed by `.calcRosterStats()`.
-As skill info is not included in this format, ship stats cannot be processed.
-Only characters will have their stats calculated.
-Relic levels are not available in this format, so stats granted by relics will not be included.
-
-**Note:** [swgoh.help's](http://api.swgoh.help) `/roster` endpoint is an array of these objects.
-While that array is not directly accepted, each element in the array is a "Units" style object that is accepted as stated above.
-
 # Changelog #
-
-* Version 1.0.1
-  * 'Minor Text Fixes' to this README
 * Version 1.0.0
   * Initial Release
