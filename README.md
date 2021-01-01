@@ -480,7 +480,8 @@ Parameters provided here can be missing in the original unit.
 
 *Default* - uses the values defined by the unit objects submitted.\
 This applies to each individual property of the `useValues` object, not just the option as a whole.
-\[top](/README.md#table-of-contents)
+
+[top](/README.md#table-of-contents)
 
 
 ### Value control ###
