@@ -9,7 +9,7 @@ Accepted data formats are those found in [swgoh.help's API](http://api.swgoh.hel
    - [.setGameData()](/README.md#setgamedata)
    - [.setMaxValues()](/README.md#setmaxvaluesnewvalues)
    - [.getMaxValueUnits](/README.md#getmaxvalueunitsoptions)
-   - [.calcCharStats()](/README.md#calcharstatschar-options-)
+   - [.calcCharStats()](/README.md#calccharstatschar-options-)
    - [.calcShipStats()](/README.md#calcshipstatsship-crew-options-)
    - [.calcRosterStats()](/README.md#calcrosterstatsunits--options-)
    - [.calcPlayerStats()](/README.md#calcplayerstatsplayers--options-)
@@ -480,7 +480,7 @@ Parameters provided here can be missing in the original unit.
 
 *Default* - uses the values defined by the unit objects submitted.\
 This applies to each individual property of the `useValues` object, not just the option as a whole.
-[top](/README.md#table-of-contents)
+\[top](/README.md#table-of-contents)
 
 
 ### Value control ###
@@ -495,7 +495,7 @@ Matches scaling status of values used internally to the game (as seen in portion
 >`scaled` - multiplies all values by 10,000.  All non-modded stats should be integers at this scale.\
 `unscaled` - multiplies all values by 100,000,000.  All stats (including mods) fit as integers at this scale.\
 *Default* - Stats returned at the expected scale as seen in-game.  Non-percent stats (like Speed) should be integers, all percent stats (like Potency) will be decimals
-[top](/README.md#table-of-contents)
+\[top](/README.md#table-of-contents)
 
 
 ### Stats Object Control ###
@@ -514,7 +514,7 @@ Activates the `percentVals` flag above, and also changes the Stats Object to hav
 >`gear` *characters* - Amount of stat granted by currently equipped gear (and unused within mod calculations).\
 >`mods` *characters* - Amount of stat granted by mods.\
 >`crew` *ships* - Amount of stat granted by crew rating.
-[top](/README.md#table-of-contents)
+\[top](/README.md#table-of-contents)
 
 
 ### Stat Naming Control ###
@@ -570,7 +570,7 @@ Any statIDs that are not in `options.language` will remain indexed as that integ
 Converts any stat name strings used in the `language` option into standard camelCase with no spaces.
 Only affects stat names defined in that parameter.\
 I.e. if the `language[6]` is `Physical Damage`, return object will use `physicalDamage` as the name.
-[top](/README.md#table-of-contents)
+\[top](/README.md#table-of-contents)
 
 
 ## Object Formats ##
@@ -629,7 +629,7 @@ Used directly by `.calcRosterStats()`
 
 **Unit**  *single element of* `player.roster`\
 Used directly by `.calcCharStats()` and `.calcShipStats()` (for both the ship and the crew members).
-[top](/README.md#table-of-contents)
+\[top](/README.md#table-of-contents)
 
 # Changelog #
 * Version 1.0.0
