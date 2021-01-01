@@ -3,6 +3,25 @@
 A class that calculates unit stats for EA's Star Wars: Galaxy of Heroes based on player data or global unit builds.
 Accepted data formats are those found in [swgoh.help's API](http://api.swgoh.help) endpoints, specifically the 'player.roster' object from their `/player` endpoint. Examples given use [swgoh-help-api Client Wrapper by PopGoesTheWza](https://github.com/PopGoesTheWza/swgoh-help-api) to get the data from the SWGOH.HELP API.
 
+## Table of Contents ##
+1. [Setup](/README.md#setup)
+2. [Methods](/README.md#methods)
+   - [.setGameData()](/README.md#setgamedata)
+   - [.setMaxValues()](/README.md#setmaxvaluesnewvalues)
+   - [.getMaxValueUnits](/README.md#getmaxvalueunitsoptions)
+   - [.calcCharStats()](/README.md#calcharstatschar-options-)
+   - [.calcShipStats()](/README.md#calcshipstatsship-crew-options-)
+   - [.calcRosterStats()](/README.md#calcrosterstatsunits--options-)
+   - [.calcPlayerStats()](/README.md#calcplayerstatsplayers--options-)
+   - [.calcCharGP()](/README.md#calcchargpchar-options)
+   - [.calcShipGP()](/README.md#calcshipgpship-crew--options)
+3. [Options](/README.md#options)
+   - [Calculation Control](/README.md#calculation-control)
+   - [Value Control](/README.md#value-control)
+   - [Stats Object Control](/README.md#stats-object-control)
+   - [Stat Naming Control](/README.md#stat-naming-control)
+4. [Object Format](/README.md#object-formats)
+
 
 ## Setup ##
 Create a new script file in your Google App Script project and then copy and paste the statCalculator.gs file to it. This file uses ES6 so you must set your Google App Script project to utilize the V8 runtime, for instructions on how to do that check [developers.google.com](https://developers.google.com/apps-script/guides/v8-runtime#enabling_the_v8_runtime). 
@@ -29,7 +48,7 @@ To create the object from [swgoh.help's](http://api.swgoh.help) `/data` endpoint
 const statCalculator = new StatCalculator();
 statCalculator.setGameData();
 ```
-
+[top](/README.md#table-of-contents)
 
 ### .setMaxValues(newValues) ###
 
@@ -469,7 +488,7 @@ Matches scaling status of values used internally to the game (as seen in portion
 *Default* - Stats returned at the expected scale as seen in-game.  Non-percent stats (like Speed) should be integers, all percent stats (like Potency) will be decimals
 
 
-### Stats Object Style ###
+### Stats Object Control ###
 
 *Default*\
 The default Stats Object Style has the following properties:
@@ -487,7 +506,7 @@ Activates the `percentVals` flag above, and also changes the Stats Object to hav
 >`crew` *ships* - Amount of stat granted by crew rating.
 
 
-### Stat Naming Options ###
+### Stat Naming Control ###
 
 `language: {Object}`\
 Tells the calculator to rename the stats using the submitted object.
@@ -518,17 +537,16 @@ Used mostly for localization.
    "37": "Physical Accuracy",
    "38": "Special Accuracy",
    "39": "Physical Critical Avoidance",
-   "40": "Special Critical Avoidance"
-   
+   "40": "Special Critical Avoidance",
    //The following stats are used only for mod calculations and are not usually displayed in the stats object. They are listed here for reference only.
-   "41": "Offense"
-   "42": "Defense"
-   "48": "Offense Percent"
-   "49": "Defense Percent"
-   "52": "Accuracy Percent"
-   "53": "Critical Chance Percent"
-   "54": "Critical Avoidance Percent"
-   "55": "Health Percent"
+   "41": "Offense",
+   "42": "Defense",
+   "48": "Offense Percent",
+   "49": "Defense Percent",
+   "52": "Accuracy Percent",
+   "53": "Critical Chance Percent",
+   "54": "Critical Avoidance Percent",
+   "55": "Health Percent",
    "56": "Protection Percent"
 }
 ```
