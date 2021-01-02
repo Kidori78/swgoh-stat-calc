@@ -72,7 +72,7 @@ StatCalculator.prototype.setGameData = function() {
 }
 /***********************************************************************************************
  * Adjusts the max values in the game
- * @param {Object} newValues - Holds the values that need to be changed
+ * @param (Object) newValues - Holds the values that need to be changed
  **********************************************************************************************/
 StatCalculator.prototype.setMaxValues = function(newValues) {
   this.maxValues = {
@@ -87,8 +87,8 @@ StatCalculator.prototype.setMaxValues = function(newValues) {
 }
 /*****************************************************************************************************
  * Get the stats for all units or a specified unit type based on maxValues. Does not include mods
- * @param {Object} options - Only accepts listed options. See Line 997 for a breakdown.
- * @return {Object} units - Returns the roster for the selected unit type
+ * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
+ * @return (Object) units - Returns the roster for the selected unit type
  *
  * @options - char: bool, ship:bool, rosterFormat: bool, gpIncludeMods: bool, calcOptions: {}
  **********************************************************************************************/
@@ -171,9 +171,9 @@ StatCalculator.prototype.getMaxValueUnits = function(options) {
 }
 /***********************************************************************************************
  * Returns a stats object for a single character
- * @param {Object} char - Unit data, see Line 1141 for needed object layout
+ * @param (Object) char - Unit data, see Line 1141 for needed object layout
  * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
- * @return (Object} stats - Stat data for the unit
+ * @return (Object) stats - Stat data for the unit
  *
  * @options - withoutModCalc: bool, calcGP: bool, gameStyle: bool, useValues: {}, percentVals: bool, scaled: bool, unscaled: bool, language: {}, noSpace: bool
  **********************************************************************************************/
@@ -361,9 +361,9 @@ StatCalculator.prototype.calcCharStats = function(char, options = {}) {
 }
 /***********************************************************************************************
  * Returns a ships stats obhect for a single ship
- * @param {Object} ship - Ship data, see Line 1141 for needed object layout
+ * @param (Object) ship - Ship data, see Line 1141 for needed object layout
  * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
- * @return (Object} stats - Stat data for the unit
+ * @return (Object) stats - Stat data for the unit
  *
  * @options - withoutModCalc: bool, calcGP: bool, gameStyle: bool, useValues: {}, percentVals: bool, scaled: bool, unscaled: bool, language: {}, noSpace: bool
  **********************************************************************************************/
@@ -455,9 +455,9 @@ StatCalculator.prototype.calcShipStats = function(ship, crew, options = {}) {
 }
 /***********************************************************************************************
  * Updates the Roster Object of player to include stats
- * @param {Object} unit - Roster data, see Line 1141 for needed object layout
+ * @param (Object) unit - Roster data, see Line 1141 for needed object layout
  * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
- * @return (Integer} count - Returns the count of units completed for that roster
+ * @return (Integer) count - Returns the count of units completed for that roster
  *
  * @options - useValues: {}, withoutModCalc: bool, calcGP: bool, percentVals: bool, scaled: bool, unscaled: bool, gameStyle: bool, language: {}, noSpace: bool,  
  **********************************************************************************************/
@@ -547,9 +547,9 @@ StatCalculator.prototype.calcRosterStats = function(units, options = {}) {
 }
 /**************************************************************************************************************************
  * Updates the Roster Object of multiple players to include stats
- * @param {Object} unit - Array of Player data including their roster, see Line 1141 for needed object layout
+ * @param (Object) unit - Array of Player data including their roster, see Line 1141 for needed object layout
  * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
- * @return (Integer} count - Returns the count of rosters completed
+ * @return (Integer) count - Returns the count of rosters completed
  *
  * @options - useValues: {}, withoutModCalc: bool, calcGP: bool, percentVals: bool, scaled: bool, unscaled: bool, gameStyle: bool, language: {}, noSpace: bool,  
  **********************************************************************************************/
@@ -566,8 +566,8 @@ StatCalculator.prototype.calcPlayerStats = function(players, options) {
 }
 /*********************************************************************************************************
  * Gets the Galatic Power of a character
- * @param {Object} unit - Character data, see Line 1141 for needed object layout
- * @param {Object} options - Only accepts listed options. See Line 997 for a breakdown.
+ * @param (Object) unit - Character data, see Line 1141 for needed object layout
+ * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
  * @return (Integer)  - Returns the GP
  *
  * @options - useValues: {}
@@ -606,9 +606,9 @@ StatCalculator.prototype.calcCharGP = function(char, options = {}) {
 }
 /***********************************************************************************************
  * Gets the Galatic Power of a ship
- * @param {Object} unit - Ship data, see Line 1141 for needed object layout
- * @param {Object} options - Only accepts listed options. See Line 997 for a breakdown.
- * @return (Integer)  - Returns the GP
+ * @param (Object) unit - Ship data, see Line 1141 for needed object layout
+ * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
+ * @return (Integer) gp - Returns the GP
  *
  * @options - useValues={}
  **********************************************************************************************/
@@ -676,10 +676,10 @@ StatCalculator.prototype.calcShipGP = function(ship, crew = [], options = {}) {
  */
 /********************************************************************************
  * Get stats for a customized roster or complete build for a character
- * @param {object} char - The unit data, see Line 1141 for needed object format
- * @param {object} useValues - The customizations to use for the units build, see Options on Line 997
- * @param {object} unitData - Unit data from the game
- * @return {object} unit - Object with new property values
+ * @param (object) char - The unit data, see Line 1141 for needed object format
+ * @param (object) useValues - The customizations to use for the units build, see Options on Line 997
+ * @param (object) unitData - Unit data from the game
+ * @return (object) unit - Object with new property values
 -------------------------------------------------------------------------------*/
 function useValuesChar(char, useValues, unitData) {
   if (!useValues || !useValues.char) return char;
@@ -712,11 +712,11 @@ function useValuesChar(char, useValues, unitData) {
 }
 /***********************************************************************************
  * Get stats for a customized roster or complete build for a ship
- * @param {object} ship - The ship data to use
- * @param {object} crew - The crew data to use
- * @param {object} useValues - The customizations to use for the unit's build, see Line 997 for details
- * @param {object} unitData - Unit data from the game
- * @return {Object} ship, crew - Ship and Crew objects with new property values
+ * @param (object) ship - The ship data to use
+ * @param (object) crew - The crew data to use
+ * @param (object) useValues - The customizations to use for the unit's build, see Line 997 for details
+ * @param (object) unitData - Unit data from the game
+ * @return (Object) ship, crew - Ship and Crew objects with new property values
 ---------------------------------------------------------------------------------*/
 function useValuesShip(ship, crew, useValues, unitData) {
   if (!useValues || !useValues.ship && !useValues.crew) return {ship: ship, crew: crew};
@@ -783,12 +783,12 @@ function useValuesShip(ship, crew, useValues, unitData) {
 }
 /**************************************************************************************************************************************************
  * Get Base Stats for unit 
- * @param {object} stats - Stats object
- * @param {integer} level - Units level
- * @param {string} baseID - Units defID from game data, also known as baseID
- * @param {object} unitData - Unit data from the game
- * @param {object} crTables - Game data
- * @returns {Object} stats - { base: {StatID: StatValue, ..}, gear: {statID: statValue,..}, growthModifiers: {2: STR_GM, 3: AGI_GM, 4: TAC_GM } }
+ * @param (object) stats - Stats object
+ * @param (integer) level - Units level
+ * @param (string) baseID - Units defID from game data, also known as baseID
+ * @param (object) unitData - Unit data from the game
+ * @param (object) crTables - Game data
+ * @returns (Object) stats - { base: {StatID: StatValue, ..}, gear: {statID: statValue,..}, growthModifiers: {2: STR_GM, 3: AGI_GM, 4: TAC_GM } }
 --------------------------------------------------------------------------------------*/
 function calculateBaseStats(stats, level, baseID, unitData, crTables) {
   // calculate bonus Primary stats from Growth Modifiers:
@@ -820,10 +820,10 @@ function calculateBaseStats(stats, level, baseID, unitData, crTables) {
 }
 /**************************************************************************************************************************************************
  * Formats stats and adjusts for any options given 
- * @param {object} stats - Stats object
- * @param {integer} level - Units current level
- * @param {object} options - Options to modify functions, see Line 997 for breakdown
- * @returns {Object} stats - Array with formatted stats
+ * @param (object) stats - Stats object
+ * @param (integer) level - Units current level
+ * @param (object) options - Options to modify functions, see Line 997 for breakdown
+ * @returns (Object) stats - Array with formatted stats
  *
  * @options - scaled:true, unscaled: true, gameStyle: true, percentVals: true
 --------------------------------------------------------------------------------------*/
@@ -954,8 +954,8 @@ function formatStats(stats, level, options) {
 }
 /**********************************************************************************************
  * Rename object keys  for stats based on language option
- * @param {object} stats - stats object to adjust keys for
- * @param {object} options - Options used in this function, see Line 997 for breakdown
+ * @param (object) stats - stats object to adjust keys for
+ * @param (object) options - Options used in this function, see Line 997 for breakdown
  * @returns  - Stats object with renamed keys
  *
  * @options - language: {object}, noSpace: (true/false)
