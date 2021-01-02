@@ -18,7 +18,7 @@
  * Functions - Specific to this class - Starts Line 668
  *
  * Options Readme - Line 997
- * Object Format Readme - Line 1141
+ * Object Format Readme - Line 1166
  */
  /*******************************************************************************************  
  * @Class StatCalculator
@@ -171,7 +171,7 @@ StatCalculator.prototype.getMaxValueUnits = function(options) {
 }
 /***********************************************************************************************
  * Returns a stats object for a single character
- * @param (Object) char - Unit data, see Line 1141 for needed object layout
+ * @param (Object) char - Unit data, see Line 1166 for needed object layout
  * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
  * @return (Object) stats - Stat data for the unit
  *
@@ -361,7 +361,7 @@ StatCalculator.prototype.calcCharStats = function(char, options = {}) {
 }
 /***********************************************************************************************
  * Returns a ships stats obhect for a single ship
- * @param (Object) ship - Ship data, see Line 1141 for needed object layout
+ * @param (Object) ship - Ship data, see Line 1166 for needed object layout
  * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
  * @return (Object) stats - Stat data for the unit
  *
@@ -455,7 +455,7 @@ StatCalculator.prototype.calcShipStats = function(ship, crew, options = {}) {
 }
 /***********************************************************************************************
  * Updates the Roster Object of player to include stats
- * @param (Object) unit - Roster data, see Line 1141 for needed object layout
+ * @param (Object) unit - Roster data, see Line 1166 for needed object layout
  * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
  * @return (Integer) count - Returns the count of units completed for that roster
  *
@@ -547,7 +547,7 @@ StatCalculator.prototype.calcRosterStats = function(units, options = {}) {
 }
 /**************************************************************************************************************************
  * Updates the Roster Object of multiple players to include stats
- * @param (Object) unit - Array of Player data including their roster, see Line 1141 for needed object layout
+ * @param (Object) unit - Array of Player data including their roster, see Line 1166 for needed object layout
  * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
  * @return (Integer) count - Returns the count of rosters completed
  *
@@ -566,7 +566,7 @@ StatCalculator.prototype.calcPlayerStats = function(players, options) {
 }
 /*********************************************************************************************************
  * Gets the Galatic Power of a character
- * @param (Object) unit - Character data, see Line 1141 for needed object layout
+ * @param (Object) unit - Character data, see Line 1166 for needed object layout
  * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
  * @return (Integer)  - Returns the GP
  *
@@ -606,7 +606,7 @@ StatCalculator.prototype.calcCharGP = function(char, options = {}) {
 }
 /***********************************************************************************************
  * Gets the Galatic Power of a ship
- * @param (Object) unit - Ship data, see Line 1141 for needed object layout
+ * @param (Object) unit - Ship data, see Line 1166 for needed object layout
  * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
  * @return (Integer) gp - Returns the GP
  *
@@ -676,7 +676,7 @@ StatCalculator.prototype.calcShipGP = function(ship, crew = [], options = {}) {
  */
 /********************************************************************************
  * Get stats for a customized roster or complete build for a character
- * @param (object) char - The unit data, see Line 1141 for needed object format
+ * @param (object) char - The unit data, see Line 1166 for needed object format
  * @param (object) useValues - The customizations to use for the units build, see Options on Line 997
  * @param (object) unitData - Unit data from the game
  * @return (object) unit - Object with new property values
@@ -1081,41 +1081,68 @@ function floor(value, digits = 0) {
    langauge: {Object}
    * Tells the calculator to rename the stats using the submitted names. Below is how an English localization will look, adjust below as needed for your language.
      language: {
-            "1": "Health",
-            "2": "Strength (STR)",
-            "3": "Agility (AGI)",
-            "4": "Tactics (TAC)",
-            "5": "Speed",
-            "6": "Physical Damage",
-            "7": "Special Damage",
-            "8": "Armor",
-            "9": "Resistance",
-            "10": "Armor Penetration",
-            "11": "Resistance Penetration",
-            "12": "Dodge Chance",
-            "13": "Deflection Chance",
-            "14": "Physical Critical Rating",
-            "15": "Special Critical Rating",
-            "16": "Critical Damage",
-            "17": "Potency",
-            "18": "Tenacity",
-            "27": "Health Steal",
-            "28": "Protection",
-            "37": "Physical Accuracy",
-            "38": "Special Accuracy",
-            "39": "Physical Critical Avoidance",
-            "40": "Special Critical Avoidance"
-          }
-    * The following stats are used only for mod calculations and are not displayed in the stats object. They are listed here for reference only.
-          "41": "Offense"
-          "42": "Defense"
-          "48": "Offense Percent"
-          "49": "Defense Percent"
-          "52": "Accuracy Percent"
-          "53": "Critical Chance Percent"
-          "54": "Critical Avoidance Percent"
-          "55": "Health Percent"
-          "56": "Protection Percent"
+                "0": "None",
+                "1": "Health",
+                "2": "Strength",
+                "3": "Agility",
+                "4": "Tactics",
+                "5": "Speed",
+                "6": "Physical Damage",
+                "7": "Special Damage",
+                "8": "Armor",
+                "9": "Resistance",
+                "10": "Armor Penetration",
+                "11": "Resistance Penetration",
+                "12": "Dodge Chance",
+                "13": "Deflection Chance",
+                "14": "Physical Critical Chance",
+                "15": "Special Critical Chance",
+                "16": "Critical Damage",
+                "17": "Potency",
+                "18": "Tenacity",
+                "19": "Dodge",
+                "20": "Deflection",
+                "21": "Physical Critical Chance",
+                "22": "Special Critical Chance",
+                "23": "Armor",
+                "24": "Resistance",
+                "25": "Armor Penetration",
+                "26": "Resistance Penetration",
+                "27": "Health Steal",
+                "28": "Protection",
+                "29": "Protection Ignore",
+                "30": "Health Regeneration",
+                "31": "Physical Damage",
+                "32": "Special Damage",
+                "33": "Physical Accuracy",
+                "34": "Special Accuracy",
+                "35": "Physical Critical Avoidance",
+                "36": "Special Critical Avoidance",
+                "37": "Physical Accuracy",
+                "38": "Special Accuracy",
+                "39": "Physical Critical Avoidance",
+                "40": "Special Critical Avoidance",
+                "41": "Offense",
+                "42": "Defense",
+                "43": "Defense Penetration",
+                "44": "Evasion",
+                "45": "Critical Chance",
+                "46": "Accuracy",
+                "47": "Critical Avoidance",
+                "48": "Offense",
+                "49": "Defense",
+                "50": "Defense Penetration",
+                "51": "Evasion",
+                "52": "Accuracy",
+                "53": "Critical Chance",
+                "54": "Critical Avoidance",
+                "55": "Health",
+                "56": "Protection",
+                "57": "Speed",
+                "58": "Counter Attack",
+                "59": "UnitStat_Taunt",
+                "61": "Mastery"
+              }
 
 
   *MAX VALUE UNITS CONTROL
