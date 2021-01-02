@@ -86,6 +86,7 @@ The object containing flags for indicating what unit type you want to return and
 {
   char: <bool>,            // true returns all characters with specified calculations
   ship: <bool>,            // true returns all ships with specified calculations
+  rosterFormat: <bool>     // OPTIONAL: true returns the units object in /player roster format.
   gpIncludeMods: <bool>,   // OPTIONAL: true returns galactic power with mod ratings included, must use with calcGP
   calcOptions: {           // OPTIONAL: for setting calculation options
                  gameStyle: <bool>,   // true returns final stats and activates percentVals, see `Options` below for a breakdown
@@ -118,6 +119,29 @@ Only one true: `ships:true` or `char:true`
   BASEID: {object},  // Roster object including .stats
   ...
 }
+```
+In roster format: `rosterFormat: true`
+```js
+{ 
+  roster: {
+            BASEID: {object},  // Roster object including .stats
+            ...
+          }
+}
+```
+
+#### Example ####
+```js
+var maxVals = {gear: 13, relic: 10, level: 85, rarity: 7 };
+statCalculator.setMaxValues(maxVals);
+var maxOptions = {ship:true, char:true, rosterFormat:true, calcOptions: {gameStyle:true, calcGP:true}};
+var relicEightUnits = statCalculator.getMaxValueUnits(maxOptions);
+maxVals = {relic: 9};
+statCalculator.setMaxValues(maxVals);
+var relicSevenUnits = statCalculator.getMaxValueUnits(maxOptions);
+maxVals = {gear: 12, relic: 1};
+statCalculator.setMaxValues(maxVals);
+var gearTwelveUnits = statCalculator.getMaxValueUnits(maxOptions);
 ```
 [top](/README.md#table-of-contents)
 
