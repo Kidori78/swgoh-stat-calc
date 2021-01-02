@@ -660,5 +660,10 @@ Used directly by `.calcCharStats()` and `.calcShipStats()` (for both the ship an
 [top](/README.md#table-of-contents)
 
 # Changelog #
+* Version 2.0.0
+  * Bug Fixes
+  * Restructured code
+  * Added 4 new methods: calcCharGP, calcShipGP, setMaxValues, getMaxValueUnits
+  * Added new property: maxValues
 * Version 1.0.0
   * Initial Release
