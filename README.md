@@ -75,8 +75,8 @@ The object containing the new value to set for the specified key(s).
 
 ### .getMaxValueUnits(options) ###
 
-Calculates stats for all ships and/or characters based on the *maxValues* property and returns it as an object.
-Allows for customizing the object returned including stat calculations and adding gp.
+Calculates stats for all ships and/or characters based on the *maxValues* property and returns it as an object. These units will have all skills at max tiers regardless of options settings.\
+Allows for customizing the object returned including stat calculations and adding gp. GP can be set to include adjustable mod values.
 
 #### Parameters ####
 
