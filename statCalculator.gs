@@ -234,7 +234,7 @@ StatCalculator.prototype.calcCharStats = function(char, options = {}) {
   // Private Method Function ----------------------------------------------------------------
   function calculateModStats(baseStats, char) {
     // return empty object if no mods
-    if ( !char.mods && !char.equippedStatMod ) return {};
+    if ( !char.mods && !char.equippedStatMod ) { return {} };
   
     // calculate raw totals on mods
     const setBonuses = {};
