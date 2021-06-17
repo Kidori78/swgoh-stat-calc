@@ -37,7 +37,7 @@ statCalculator.setGameData();
 
 ### .setGameData() ###
 
-Sets the needed data object for calculating all galactic power and stats by fetching it from https://swgoh-stat-calc.glitch.me/gameData.json and applying them to the classes properties.
+Sets the needed data object for calculating all galactic power and stats by fetching it from https://swgoh-stat-calc.glitch.me/gameData.json and applying them to the classes properties. Also also for fetching the gameData file from this repository in the event that the other gameData.json file is outdated.
 As hinted at in the **Setup** code above, this needs to be called before any other methods can be used.
 That link should remain active and updated, and thus can be used directly to create the data object.
 To create the object from [swgoh.help's](http://api.swgoh.help) `/data` endpoint, see the code in [dataBuilder.js](https://glitch.com/edit/#!/swgoh-stat-calc?path=statCalc/dataBuilder.js). (A separate package for this code will be created in the future, but for now, it's just hiding in that project).
