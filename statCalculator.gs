@@ -50,7 +50,8 @@ StatCalculator.prototype.setGameData = function() {
   const parameters = {'muteHttpExceptions': true};
   var gameData = undefined;
   // Check boosted url first
-  var apiResponse = UrlFetchApp.fetch('https://swgoh-stat-calc.glitch.me/gameData.json',parameters);
+  var apiResponse = UrlFetchApp.fetch('https://raw.githubusercontent.com/Kidori78/swgoh-stat-calc/GAS-v2/gameData.json',parameters); 
+  //var apiResponse = UrlFetchApp.fetch('https://swgoh-stat-calc.glitch.me/gameData.json',parameters);
   if (apiResponse.getResponseCode() === 200){
     gameData = JSON.parse(apiResponse.getContentText());
   }
