@@ -1,27 +1,23 @@
 /**
  * @OnlyCurrentDoc
- *
- * CREDITS: This class is a converted version of swgoh-stat-calc by Crinolo (https://github.com/Crinolo/swgoh-stat-calc)
- *
- * StatCalculator class for Google App Script (GAS)
- * Available Methods
-    .setGameData(gameData) - Line 48
-    .setMaxValues(options) - Line 77
-    .getMaxValueUnits(options) - Line 95
-    .calcCharStats(char, options) - Line 180
-    .calcShipStats(ship, crew, options) - Line 370
-    .calcRosterStats(roster, options) - Line 464
-    .calcPlayerStats(player, options) - Line 556
-    .calcCharGP(char, options) - Line 575
-    .calcShipGP(ship, crew, options) - Line 615
- *
- * Functions - Specific to this class - Starts Line 668
- *
- * Options Readme - Line 997
- * Object Format Readme - Line 1166
- */
- /*******************************************************************************************  
+*/
+/* 
+ CREDITS: This class is a modified version of swgoh-stat-calc by Crinolo (https://github.com/Crinolo/swgoh-stat-calc)
+ Options README at Line 1124
+ Object Format README at Line 1294
+*/
+ /**
  * @Class StatCalculator
+ * Available Methods
+    .setGameData(gameData)
+    .setMaxValues(options)
+    .getMaxValueUnits(options)
+    .calcCharStats(char, options)
+    .calcShipStats(ship, crew, options)
+    .calcRosterStats(roster, options)
+    .calcPlayerStats(player, options)
+    .calcCharGP(char, options)
+    .calcShipGP(ship, crew, options)
  */
 function StatCalculator() {
   /** Constructor */
@@ -35,33 +31,102 @@ function StatCalculator() {
       rarity: 7,
       level: 85,
       gear: 13,
-      relic: 10, // In-game Relic level + 2 
+      relic: 11, // In-game Relic level + 2 
       modRarity: 6,
       modLevel: 15,
       modTier: 5
   };
+  this.errorShown = false;
+  this.lang = {
+                "0": "None",
+                "1": "Health",
+                "2": "Strength",
+                "3": "Agility",
+                "4": "Tactics",
+                "5": "Speed",
+                "6": "Physical Damage",
+                "7": "Special Damage",
+                "8": "Armor",
+                "9": "Resistance",
+                "10": "Armor Penetration",
+                "11": "Resistance Penetration",
+                "12": "Dodge Chance",
+                "13": "Deflection Chance",
+                "14": "Physical Critical Chance",
+                "15": "Special Critical Chance",
+                "16": "Critical Damage",
+                "17": "Potency",
+                "18": "Tenacity",
+                "19": "Dodge",
+                "20": "Deflection",
+                "21": "Physical Critical Chance",
+                "22": "Special Critical Chance",
+                "23": "Armor",
+                "24": "Resistance",
+                "25": "Armor Penetration",
+                "26": "Resistance Penetration",
+                "27": "Health Steal",
+                "28": "Protection",
+                "29": "Protection Ignore",
+                "30": "Health Regeneration",
+                "31": "Physical Damage",
+                "32": "Special Damage",
+                "33": "Physical Accuracy",
+                "34": "Special Accuracy",
+                "35": "Physical Critical Avoidance",
+                "36": "Special Critical Avoidance",
+                "37": "Physical Accuracy",
+                "38": "Special Accuracy",
+                "39": "Physical Critical Avoidance",
+                "40": "Special Critical Avoidance",
+                "41": "Offense",
+                "42": "Defense",
+                "43": "Defense Penetration",
+                "44": "Evasion",
+                "45": "Critical Chance",
+                "46": "Accuracy",
+                "47": "Critical Avoidance",
+                "48": "Offense",
+                "49": "Defense",
+                "50": "Defense Penetration",
+                "51": "Evasion",
+                "52": "Accuracy",
+                "53": "Critical Chance",
+                "54": "Critical Avoidance",
+                "55": "Health",
+                "56": "Protection",
+                "57": "Speed",
+                "58": "Counter Attack",
+                "59": "UnitStat_Taunt",
+                "61": "Mastery"
+              }
 }
 /***********************************************************************************************
- * Gets needed data files from swgoh-stat-calc api and sets them as global variables
-   - File made from (https://glitch.com/edit/#!/swgoh-stat-calc?path=statCalc/dataBuilder.js)
+ * Gets needed data files from swgoh-stat-calc api and sets them as global variables. File made from (https://github.com/Crinolo/swgoh-stat-calc-dataBuilder)
+ * @param (String) url - Defines the url of the gameData.json file. Defaults to swgoh-utils/gamedata
  **********************************************************************************************/
-StatCalculator.prototype.setGameData = function() {
+StatCalculator.prototype.setGameData = function(url=null) {
   // Get gameData file for conversions
   const parameters = {'muteHttpExceptions': true};
+  if (url === null){
+    url = 'https://raw.githubusercontent.com/swgoh-utils/gamedata/main/gameData.json';
+  }
   var gameData = undefined;
-  // Check boosted url first
-  var apiResponse = UrlFetchApp.fetch('https://raw.githubusercontent.com/Kidori78/swgoh-stat-calc/GAS-v2/gameData.json',parameters); 
-  //var apiResponse = UrlFetchApp.fetch('https://swgoh-stat-calc.glitch.me/gameData.json',parameters);
+  // Check provided url
+  var apiResponse = UrlFetchApp.fetch(url,parameters);
   if (apiResponse.getResponseCode() === 200){
     gameData = JSON.parse(apiResponse.getContentText());
+    if(gameData.version){
+      gameData = gameData.data;
+    }
   }
   else {
-    // Check backup url if first fails
-    apiResponse = UrlFetchApp.fetch('https://swgoh-api-stat-calc.glitch.me/gameData.json',parameters);
+    // Check backup url if first fails, this url can be replaced with your own if you are using a copy of the SWGoH Comlink for Github repo
+    apiResponse = UrlFetchApp.fetch('https://raw.githubusercontent.com/Kidori78/swgoh-comlink-for-github/main/data/gameData.json',parameters); 
     if (apiResponse.getResponseCode() === 200){
       gameData = JSON.parse(apiResponse.getContentText());
     }else{
-      throw new Error(apiResponse.getResponseCode() + ' : There was a problem getting the gameData object from https://swgoh-stat-calc.glitch.me/gameData.json. If you keep getting this message you may check on its status at the SWGOH.HELP Discord.');
+      throw new Error(apiResponse.getResponseCode() + ' : There was a problem getting the gameData object. Verify you are using a valid url for the location of the gameData.json file.');
     }
   }
   this.unitData = gameData.unitData;
@@ -88,7 +153,7 @@ StatCalculator.prototype.setMaxValues = function(newValues) {
 }
 /*****************************************************************************************************
  * Get the stats for all units or a specified unit type based on maxValues. Does not include mods
- * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
+ * @param (Object) options - Only accepts listed options. See Line 1124 for a breakdown.
  * @return (Object) units - Returns the roster for the selected unit type
  *
  * @options - char: bool, ship:bool, rosterFormat: bool, gpIncludeMods: bool, calcOptions: {}
@@ -172,8 +237,8 @@ StatCalculator.prototype.getMaxValueUnits = function(options) {
 }
 /***********************************************************************************************
  * Returns a stats object for a single character
- * @param (Object) char - Unit data, see Line 1166 for needed object layout
- * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
+ * @param (Object) char - Unit data, see Line 1294 for needed object layout
+ * @param (Object) options - Only accepts listed options. See Line 1124 for a breakdown.
  * @return (Object) stats - Stat data for the unit
  *
  * @options - withoutModCalc: bool, calcGP: bool, gameStyle: bool, useValues: {}, percentVals: bool, scaled: bool, unscaled: bool, language: {}, noSpace: bool
@@ -184,19 +249,78 @@ StatCalculator.prototype.calcCharStats = function(char, options = {}) {
   const crTables = this.crTables;
   const relicData = this.relicData;
   const modSetData = this.modSetData;
-  
-  if (options.useValues){
-    char = useValuesChar(char, options.useValues, unitData);
+  if(options.language){
+    if(options.language === "default"){ options.language = this.lang;}
   }
-  let stats = getCharRawStats(char);
-  stats = calculateBaseStats(stats, char.level, char.defId, unitData, crTables);
-  if (!options.withoutModCalc) { 
-    stats.mods = calculateModStats(stats.base, char);
+
+  try{
+    if (options.useValues){
+      char = useValuesChar(char, options.useValues, unitData);
+    }
+    let stats = getCharRawStats(char);
+    stats = calculateBaseStats(stats, char.level, char.defId, unitData, crTables);
+    if (!options.withoutModCalc) { 
+      stats.mods = calculateModStats(stats.base, char);
+    }
+    stats = formatStats(stats, char.level, options);
+    stats = renameStats(stats, options);
+    
+    return stats;
+  } catch(e) {
+    console.error(e.stack);
+    if(!this.errorShown){
+      SpreadsheetApp.getUi().alert('There was a problem getting the stats for ' + char["defId"] +'. The gameData file required by statCalculator may be outdated, if this characters stats are needed try again or ask in Discord for help.');
+      this.errorShown = true;
+    }
+    return {final: {
+      1: 0,
+      2: 0, 
+      3: 0, 
+      4: 0, 
+      5: 0, 
+      6: 0, 
+      7: 0, 
+      8: 0, 
+      9: 0, 
+      12: 0, 
+      13: 0, 
+      14: 0, 
+      15: 0, 
+      16: 0, 
+      17: 0, 
+      18: 0, 
+      28: 0, 
+      37: 0, 
+      38: 0, 
+      39: 0, 
+      40: 0 
+      },
+      base: {
+      1: 0,
+      2: 0, 
+      3: 0, 
+      4: 0, 
+      5: 0, 
+      6: 0, 
+      7: 0, 
+      8: 0, 
+      9: 0, 
+      12: 0, 
+      13: 0, 
+      14: 0, 
+      15: 0, 
+      16: 0, 
+      17: 0, 
+      18: 0, 
+      28: 0, 
+      37: 0, 
+      38: 0, 
+      39: 0, 
+      40: 0 
+      }, 
+      mods: {}
+      };
   }
-  stats = formatStats(stats, char.level, options);
-  stats = renameStats(stats, options);
-  
-  return stats;
   
   // Private Method Function ----------------------------------------------------------------
   function getCharRawStats(char) {
@@ -362,8 +486,8 @@ StatCalculator.prototype.calcCharStats = function(char, options = {}) {
 }
 /***********************************************************************************************
  * Returns a ships stats obhect for a single ship
- * @param (Object) ship - Ship data, see Line 1166 for needed object layout
- * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
+ * @param (Object) ship - Ship data, see Line 1294 for needed object layout
+ * @param (Object) options - Only accepts listed options. See Line 1124 for a breakdown.
  * @return (Object) stats - Stat data for the unit
  *
  * @options - withoutModCalc: bool, calcGP: bool, gameStyle: bool, useValues: {}, percentVals: bool, scaled: bool, unscaled: bool, language: {}, noSpace: bool
@@ -371,6 +495,9 @@ StatCalculator.prototype.calcCharStats = function(char, options = {}) {
 StatCalculator.prototype.calcShipStats = function(ship, crew, options = {}) {
   const unitData = this.unitData;
   const crTables = this.crTables;
+  if(options.language){
+    if(options.language === "default"){ options.language = this.lang;}
+  }
 
   try {
     ({ship, crew} = useValuesShip(ship, crew, options.useValues, unitData));
@@ -456,8 +583,8 @@ StatCalculator.prototype.calcShipStats = function(ship, crew, options = {}) {
 }
 /***********************************************************************************************
  * Updates the Roster Object of player to include stats
- * @param (Object) unit - Roster data, see Line 1166 for needed object layout
- * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
+ * @param (Object) unit - Roster data, see Line 1294 for needed object layout
+ * @param (Object) options - Only accepts listed options. See Line 1124 for a breakdown.
  * @return (Integer) count - Returns the count of units completed for that roster
  *
  * @options - useValues: {}, withoutModCalc: bool, calcGP: bool, percentVals: bool, scaled: bool, unscaled: bool, gameStyle: bool, language: {}, noSpace: bool,  
@@ -548,8 +675,8 @@ StatCalculator.prototype.calcRosterStats = function(units, options = {}) {
 }
 /**************************************************************************************************************************
  * Updates the Roster Object of multiple players to include stats
- * @param (Object) unit - Array of Player data including their roster, see Line 1166 for needed object layout
- * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
+ * @param (Object) unit - Array of Player data including their roster, see Line 1294 for needed object layout
+ * @param (Object) options - Only accepts listed options. See Line 1124 for a breakdown.
  * @return (Integer) count - Returns the count of rosters completed
  *
  * @options - useValues: {}, withoutModCalc: bool, calcGP: bool, percentVals: bool, scaled: bool, unscaled: bool, gameStyle: bool, language: {}, noSpace: bool,  
@@ -567,8 +694,8 @@ StatCalculator.prototype.calcPlayerStats = function(players, options) {
 }
 /*********************************************************************************************************
  * Gets the Galatic Power of a character
- * @param (Object) unit - Character data, see Line 1166 for needed object layout
- * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
+ * @param (Object) unit - Character data, see Line 1294 for needed object layout
+ * @param (Object) options - Only accepts listed options. See Line 1124 for a breakdown.
  * @return (Integer)  - Returns the GP
  *
  * @options - useValues: {}
@@ -577,24 +704,29 @@ StatCalculator.prototype.calcCharGP = function(char, options = {}) {
     const gpTables = this.gpTables;
     const unitData = this.unitData;
     
-    char = useValuesChar(char, options.useValues, unitData);
-    let gp = gpTables.unitLevelGP[ char.level ];
-    gp += gpTables.unitRarityGP[ char.rarity ];
-    gp += gpTables.gearLevelGP[ char.gear ];
-    // Game tables for current gear include the possibility of differect GP per slot.
-    // Currently, all values are identical across each gear level, so a simpler method is possible.
-    // But that could change at any time.
-    gp = char.equipped.reduce( (power, piece) => power + gpTables.gearPieceGP[ char.gear ][ piece.slot ], gp);
-    gp = char.skills.reduce( (power, skill) => power + getSkillGP(char.defId, skill), gp);
-    if (char.purchasedAbilityId) gp += char.purchasedAbilityId.length * gpTables.abilitySpecialGP.ultimate;
-    if (char.mods) gp = char.mods.reduce( (power, mod) => power + gpTables.modRarityLevelTierGP[ mod.pips ][ mod.level ][ mod.tier ], gp);
-    else if (char.equippedStatMod) gp = char.equippedStatMod.reduce( (power, mod) => power + gpTables.modRarityLevelTierGP[ +mod.definitionId[1] ][ mod.level ][ mod.tier ], gp)
-    
-    if (char.relic && char.relic.currentTier > 2) {
-      gp += gpTables.relicTierGP[ char.relic.currentTier ];
-      gp += char.level * gpTables.relicTierLevelFactor[ char.relic.currentTier ];
+    try{
+      char = useValuesChar(char, options.useValues, unitData);
+      let gp = gpTables.unitLevelGP[ char.level ];
+      gp += gpTables.unitRarityGP[ char.rarity ];
+      gp += gpTables.gearLevelGP[ char.gear ];
+      // Game tables for current gear include the possibility of differect GP per slot.
+      // Currently, all values are identical across each gear level, so a simpler method is possible.
+      // But that could change at any time.
+      gp = char.equipped.reduce( (power, piece) => power + gpTables.gearPieceGP[ char.gear ][ piece.slot ], gp);
+      gp = char.skills.reduce( (power, skill) => power + getSkillGP(char.defId, skill), gp);
+      if (char.purchasedAbilityId) gp += char.purchasedAbilityId.length * gpTables.abilitySpecialGP.ultimate;
+      if (char.mods) gp = char.mods.reduce( (power, mod) => power + gpTables.modRarityLevelTierGP[ mod.pips ][ mod.level ][ mod.tier ], gp);
+      else if (char.equippedStatMod) gp = char.equippedStatMod.reduce( (power, mod) => power + gpTables.modRarityLevelTierGP[ +mod.definitionId[1] ][ mod.level ][ mod.tier ], gp)
+      
+      if (char.relic && char.relic.currentTier > 2) {
+        gp += gpTables.relicTierGP[ char.relic.currentTier ];
+        gp += char.level * gpTables.relicTierLevelFactor[ char.relic.currentTier ];
+      }
+      return floor( gp*1.5 );
+
+    }catch(e){
+      return 0;
     }
-    return floor( gp*1.5 );
     
     // Private Method Function ----------------------------------------------------------------
     function getSkillGP(id, skill) {
@@ -607,8 +739,8 @@ StatCalculator.prototype.calcCharGP = function(char, options = {}) {
 }
 /***********************************************************************************************
  * Gets the Galatic Power of a ship
- * @param (Object) unit - Ship data, see Line 1166 for needed object layout
- * @param (Object) options - Only accepts listed options. See Line 997 for a breakdown.
+ * @param (Object) unit - Ship data, see Line 1294 for needed object layout
+ * @param (Object) options - Only accepts listed options. See Line 1124 for a breakdown.
  * @return (Integer) gp - Returns the GP
  *
  * @options - useValues={}
@@ -677,20 +809,20 @@ StatCalculator.prototype.calcShipGP = function(ship, crew = [], options = {}) {
  */
 /********************************************************************************
  * Get stats for a customized roster or complete build for a character
- * @param (object) char - The unit data, see Line 1166 for needed object format
- * @param (object) useValues - The customizations to use for the units build, see Options on Line 997
+ * @param (object) char - The unit data, see Line 1294 for needed object format
+ * @param (object) useValues - The customizations to use for the units build, see Options on Line 1124
  * @param (object) unitData - Unit data from the game
  * @return (object) unit - Object with new property values
 -------------------------------------------------------------------------------*/
 function useValuesChar(char, useValues, unitData) {
   if (!useValues || !useValues.char) return char;
   let unit = {
-    defId: char.defId,
+    defId: char.defId || char.baseId || char,
     rarity: useValues.char.rarity || char.rarity,
     level: useValues.char.level || char.level,
     gear: useValues.char.gear || char.gear,
-    equipped: char.equipped,
-    mods: char.mods,
+    equipped: useValues.char.equipped || char.equipped,
+    mods: useValues.char.mods || char.mods || [],
     relic: useValues.char.relic ? {currentTier: useValues.char.relic } : char.relic,
     skills: useValues.char.skills || char.skills || []
   };
@@ -715,7 +847,7 @@ function useValuesChar(char, useValues, unitData) {
  * Get stats for a customized roster or complete build for a ship
  * @param (object) ship - The ship data to use
  * @param (object) crew - The crew data to use
- * @param (object) useValues - The customizations to use for the unit's build, see Line 997 for details
+ * @param (object) useValues - The customizations to use for the unit's build, see Line 1124 for details
  * @param (object) unitData - Unit data from the game
  * @return (Object) ship, crew - Ship and Crew objects with new property values
 ---------------------------------------------------------------------------------*/
@@ -823,7 +955,7 @@ function calculateBaseStats(stats, level, baseID, unitData, crTables) {
  * Formats stats and adjusts for any options given 
  * @param (object) stats - Stats object
  * @param (integer) level - Units current level
- * @param (object) options - Options to modify functions, see Line 997 for breakdown
+ * @param (object) options - Options to modify functions, see Line 1124 for breakdown
  * @returns (Object) stats - Array with formatted stats
  *
  * @options - scaled:true, unscaled: true, gameStyle: true, percentVals: true
@@ -956,7 +1088,7 @@ function formatStats(stats, level, options) {
 /**********************************************************************************************
  * Rename object keys  for stats based on language option
  * @param (object) stats - stats object to adjust keys for
- * @param (object) options - Options used in this function, see Line 997 for breakdown
+ * @param (object) options - Options used in this function, see Line 1124 for breakdown
  * @returns  - Stats object with renamed keys
  *
  * @options - language: {object}, noSpace: (true/false)
@@ -1077,9 +1209,9 @@ function floor(value, digits = 0) {
  
  * STAT NAMING CONTROL
    noSpace: true
-   * Converts any stat name string used by the below langauge option into standard camelCase with no spaces.
+   * Converts any stat name string used by the below language option into standard camelCase with no spaces.
    
-   langauge: {Object}
+   language: {Object}
    * Tells the calculator to rename the stats using the submitted names. Below is how an English localization will look, adjust below as needed for your language.
      language: {
                 "0": "None",
@@ -1144,7 +1276,6 @@ function floor(value, digits = 0) {
                 "59": "UnitStat_Taunt",
                 "61": "Mastery"
               }
-
 
   *MAX VALUE UNITS CONTROL
     char:true
@@ -1211,4 +1342,3 @@ function floor(value, digits = 0) {
    [ { roster: [ {character Object}, {character Object} ] }, {roster: [ {character Object} ] } ]
    
  */
- 
