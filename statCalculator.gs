@@ -3,8 +3,8 @@
 */
 /* 
  CREDITS: This class is a modified version of swgoh-stat-calc by Crinolo (https://github.com/Crinolo/swgoh-stat-calc)
- Options README at Line 1124
- Object Format README at Line 1294
+ Options README at Line 1257
+ Object Format README at Line 1427
 */
  /**
  * @Class StatCalculator
@@ -153,7 +153,7 @@ StatCalculator.prototype.setMaxValues = function(newValues) {
 }
 /*****************************************************************************************************
  * Get the stats for all units or a specified unit type based on maxValues. Does not include mods
- * @param (Object) options - Only accepts listed options. See Line 1124 for a breakdown.
+ * @param (Object) options - Only accepts listed options. See Line 1257 for a breakdown.
  * @return (Object) units - Returns the roster for the selected unit type
  *
  * @options - char: bool, ship:bool, rosterFormat: bool, gpIncludeMods: bool, calcOptions: {}
@@ -237,8 +237,8 @@ StatCalculator.prototype.getMaxValueUnits = function(options) {
 }
 /***********************************************************************************************
  * Returns a stats object for a single character
- * @param (Object) char - Unit data, see Line 1294 for needed object layout
- * @param (Object) options - Only accepts listed options. See Line 1124 for a breakdown.
+ * @param (Object) char - Unit data, see Line 1427 for needed object layout
+ * @param (Object) options - Only accepts listed options. See Line 1257 for a breakdown.
  * @return (Object) stats - Stat data for the unit
  *
  * @options - withoutModCalc: bool, calcGP: bool, gameStyle: bool, useValues: {}, percentVals: bool, scaled: bool, unscaled: bool, language: {}, noSpace: bool
@@ -251,6 +251,27 @@ StatCalculator.prototype.calcCharStats = function(char, options = {}) {
   const modSetData = this.modSetData;
   if(options.language){
     if(options.language === "default"){ options.language = this.lang;}
+  }
+  //Format raw data
+  if(!char.defId) { char["defId"] = char.definitionId.substring(0, char.definitionId.indexOf(":")); }
+  if(!char.level) { char["level"] = char.currentLevel; }
+  if(!char.rarity) { char["rarity"] = char.currentRarity; }
+  if(!char.gear) { char["gear"] = char.currentTier; }
+  if(!char.equipped) { char["equipped"] = char.equipment; }
+  if(!char.skills) { 
+      char["skills"] = char.skill;
+      char.skills.forEach(skill => {
+        skill.tier = skill.tier + 2;
+      });
+      if(char.skills.length !== unitData[char.defId].skills.length){
+        let skillList = [];
+        char.skills.forEach(sk => skillList[sk.id] = true );
+        unitData[ char.defId].skills.forEach(skill => {
+          if(!skillList[skill.id]) {
+            char.skills.push({id: skill.id, tier: 1 });
+          }
+        })
+      }
   }
 
   try{
@@ -359,14 +380,15 @@ StatCalculator.prototype.calcCharStats = function(char, options = {}) {
   // Private Method Function ----------------------------------------------------------------
   function calculateModStats(baseStats, char) {
     // return empty object if no mods
-    if ( !char.mods && !char.equippedStatMod ) { return {} };
-  
+    if ( !char.mods && !char.equippedStatMod ) { return {} }
+
     // calculate raw totals on mods
     const setBonuses = {};
     const rawModStats = {};
     if (char.mods) {
       char.mods.forEach(mod => {
         if (!mod.set) { return; } // ignore if empty mod (/units format only) 
+
         // add to set bonuses counters (same for both formats)
         if (setBonuses[ mod.set ]) {
           // set bonus already found, increment
@@ -486,8 +508,8 @@ StatCalculator.prototype.calcCharStats = function(char, options = {}) {
 }
 /***********************************************************************************************
  * Returns a ships stats obhect for a single ship
- * @param (Object) ship - Ship data, see Line 1294 for needed object layout
- * @param (Object) options - Only accepts listed options. See Line 1124 for a breakdown.
+ * @param (Object) ship - Ship data, see Line 1427 for needed object layout
+ * @param (Object) options - Only accepts listed options. See Line 1257 for a breakdown.
  * @return (Object) stats - Stat data for the unit
  *
  * @options - withoutModCalc: bool, calcGP: bool, gameStyle: bool, useValues: {}, percentVals: bool, scaled: bool, unscaled: bool, language: {}, noSpace: bool
@@ -498,6 +520,47 @@ StatCalculator.prototype.calcShipStats = function(ship, crew, options = {}) {
   if(options.language){
     if(options.language === "default"){ options.language = this.lang;}
   }
+  //Format raw data
+  if(!ship.defId) { ship["defId"] = ship.definitionId.substring(0, ship.definitionId.indexOf(":")); }
+  if(!ship.level) { ship["level"] = ship.currentLevel; }
+  if(!ship.rarity) { ship["rarity"] = ship.currentRarity; }
+  if(!ship.skills) { 
+      ship["skills"] = ship.skill;
+      ship.skills.forEach(skill => {
+        skill.tier = skill.tier + 2;
+      });
+      if(ship.skills.length !== unitData[ship.defId].skills.length){
+        let skillList = [];
+        ship.skills.forEach(sk => skillList[sk.id] = true );
+        unitData[ ship.defId].skills.forEach(skill => {
+          if(!skillList[skill.id]) {
+            ship.skills.push({id: skill.id, tier: 1 });
+          }
+        })
+      }
+  }
+  crew.forEach(char => {
+    if(!char.defId) { char["defId"] = char.definitionId.substring(0, char.definitionId.indexOf(":")); }
+    if(!char.level) { char["level"] = char.currentLevel; }
+    if(!char.rarity) { char["rarity"] = char.currentRarity; }
+    if(!char.gear) { char["gear"] = char.currentTier; }
+    if(!char.equipped) { char["equipped"] = char.equipment; }
+    if(!char.skills) { 
+      char["skills"] = char.skill;
+      char.skills.forEach(skill => {
+        skill.tier = skill.tier + 2;
+      });
+      if(char.skills.length !== unitData[char.defId].skills.length){
+        let skillList = [];
+        char.skills.forEach(sk => skillList[sk.id] = true );
+        unitData[ char.defId].skills.forEach(skill => {
+          if(!skillList[skill.id]) {
+            char.skills.push({id: skill.id, tier: 1 });
+          }
+        })
+      }
+    }
+  });
 
   try {
     ({ship, crew} = useValuesShip(ship, crew, options.useValues, unitData));
@@ -583,8 +646,8 @@ StatCalculator.prototype.calcShipStats = function(ship, crew, options = {}) {
 }
 /***********************************************************************************************
  * Updates the Roster Object of player to include stats
- * @param (Object) unit - Roster data, see Line 1294 for needed object layout
- * @param (Object) options - Only accepts listed options. See Line 1124 for a breakdown.
+ * @param (Object) unit - Roster data, see Line 1427 for needed object layout
+ * @param (Object) options - Only accepts listed options. See Line 1257 for a breakdown.
  * @return (Integer) count - Returns the count of units completed for that roster
  *
  * @options - useValues: {}, withoutModCalc: bool, calcGP: bool, percentVals: bool, scaled: bool, unscaled: bool, gameStyle: bool, language: {}, noSpace: bool,  
@@ -600,7 +663,8 @@ StatCalculator.prototype.calcRosterStats = function(units, options = {}) {
   if (Object.prototype.toString.call(units) === '[object Array]') {
     // get character stats
     units.forEach( unit => {
-      //let defID = unit.defId;
+      if(!unit.defId) { unit["defId"] = unit.definitionId.substring(0, unit.definitionId.indexOf(":")); }
+      if(!unit.combatType) { unit.combatType = unitData[unit.defId].combatType; }
       //if (!unit || !unitData[defID]) return;
       if (unit.combatType == 2) { // is ship
         ships.push( unit );
@@ -612,6 +676,7 @@ StatCalculator.prototype.calcRosterStats = function(units, options = {}) {
     });
     // get ship stats
     ships.forEach( ship => {
+      if(!ship.crew) { ship["crew"] = unitData[ ship.defId ].crew.map(char => { return {unitId: char }}) || []; }
       crw = ship.crew.map(c => crew[c.unitId]);
       ship.stats = this.calcShipStats(ship, crw, options);
       if (options.calcGP) {
@@ -675,8 +740,8 @@ StatCalculator.prototype.calcRosterStats = function(units, options = {}) {
 }
 /**************************************************************************************************************************
  * Updates the Roster Object of multiple players to include stats
- * @param (Object) unit - Array of Player data including their roster, see Line 1294 for needed object layout
- * @param (Object) options - Only accepts listed options. See Line 1124 for a breakdown.
+ * @param (Object) unit - Array of Player data including their roster, see Line 1427 for needed object layout
+ * @param (Object) options - Only accepts listed options. See Line 1257 for a breakdown.
  * @return (Integer) count - Returns the count of rosters completed
  *
  * @options - useValues: {}, withoutModCalc: bool, calcGP: bool, percentVals: bool, scaled: bool, unscaled: bool, gameStyle: bool, language: {}, noSpace: bool,  
@@ -685,17 +750,17 @@ StatCalculator.prototype.calcPlayerStats = function(players, options) {
   if (Object.prototype.toString.call(players) === '[object Array]') { // full profile array from /player
       let count = 0;
       players.forEach( player => {
-        count += this.calcRosterStats(player.roster, options);
+        count += this.calcRosterStats((player.roster) ? player.roster : player.rosterUnit, options);
       });
       return count;
   } else { // single player object
-      return this.calcRosterStats(players.roster, options);
+      return this.calcRosterStats((players.roster) ? players.roster : players.rosterUnit, options);
   }
 }
 /*********************************************************************************************************
  * Gets the Galatic Power of a character
- * @param (Object) unit - Character data, see Line 1294 for needed object layout
- * @param (Object) options - Only accepts listed options. See Line 1124 for a breakdown.
+ * @param (Object) unit - Character data, see Line 1427 for needed object layout
+ * @param (Object) options - Only accepts listed options. See Line 1257 for a breakdown.
  * @return (Integer)  - Returns the GP
  *
  * @options - useValues: {}
@@ -704,6 +769,28 @@ StatCalculator.prototype.calcCharGP = function(char, options = {}) {
     const gpTables = this.gpTables;
     const unitData = this.unitData;
     
+    //Format raw data
+    if(!char.defId) { char["defId"] = char.definitionId.substring(0, char.definitionId.indexOf(":")); }
+    if(!char.level) { char["level"] = char.currentLevel; }
+    if(!char.rarity) { char["rarity"] = char.currentRarity; }
+    if(!char.gear) { char["gear"] = char.currentTier; }
+    if(!char.equipped) { char["equipped"] = char.equipment; }
+    if(!char.skills) { 
+      char["skills"] = char.skill;
+      char.skills.forEach(skill => {
+        skill.tier = skill.tier + 2;
+      });
+      if(char.skills.length !== unitData[char.defId].skills.length){
+        let skillList = [];
+        char.skills.forEach(sk => skillList[sk.id] = true );
+        unitData[ char.defId].skills.forEach(skill => {
+          if(!skillList[skill.id]) {
+            char.skills.push({id: skill.id, tier: 1 });
+          }
+        })
+      }
+    }
+
     try{
       char = useValuesChar(char, options.useValues, unitData);
       let gp = gpTables.unitLevelGP[ char.level ];
@@ -739,8 +826,8 @@ StatCalculator.prototype.calcCharGP = function(char, options = {}) {
 }
 /***********************************************************************************************
  * Gets the Galatic Power of a ship
- * @param (Object) unit - Ship data, see Line 1294 for needed object layout
- * @param (Object) options - Only accepts listed options. See Line 1124 for a breakdown.
+ * @param (Object) unit - Ship data, see Line 1427 for needed object layout
+ * @param (Object) options - Only accepts listed options. See Line 1257 for a breakdown.
  * @return (Integer) gp - Returns the GP
  *
  * @options - useValues={}
@@ -748,6 +835,49 @@ StatCalculator.prototype.calcCharGP = function(char, options = {}) {
 StatCalculator.prototype.calcShipGP = function(ship, crew = [], options = {}) {
   const gpTables = this.gpTables;
   const unitData = this.unitData;
+
+  //Format raw data
+  if(!ship.defId) { ship["defId"] = ship.definitionId.substring(0, ship.definitionId.indexOf(":")); }
+  if(!ship.level) { ship["level"] = ship.currentLevel; }
+  if(!ship.rarity) { ship["rarity"] = ship.currentRarity; }
+  if(!ship.skills) { 
+      ship["skills"] = ship.skill;
+      ship.skills.forEach(skill => {
+        skill.tier = skill.tier + 2;
+      });
+      if(ship.skills.length !== unitData[ship.defId].skills.length){
+        let skillList = [];
+        ship.skills.forEach(sk => skillList[sk.id] = true );
+        unitData[ ship.defId].skills.forEach(skill => {
+          if(!skillList[skill.id]) {
+            ship.skills.push({id: skill.id, tier: 1 });
+          }
+        })
+      }
+  }
+  crew.forEach(char => {
+    if(!char.defId) { char["defId"] = char.definitionId.substring(0, char.definitionId.indexOf(":")); }
+    if(!char.level) { char["level"] = char.currentLevel; }
+    if(!char.rarity) { char["rarity"] = char.currentRarity; }
+    if(!char.gear) { char["gear"] = char.currentTier; }
+    if(!char.equipped) { char["equipped"] = char.equipment; }
+    if(!char.skills) { 
+      char["skills"] = char.skill;
+      char.skills.forEach(skill => {
+        skill.tier = skill.tier + 2;
+      });
+      if(char.skills.length !== unitData[char.defId].skills.length){
+        let skillList = [];
+        char.skills.forEach(sk => skillList[sk.id] = true );
+        unitData[ char.defId].skills.forEach(skill => {
+          if(!skillList[skill.id]) {
+            char.skills.push({id: skill.id, tier: 1 });
+          }
+        })
+      }
+    }
+  });
+
   ({ship, crew} = useValuesShip(ship, crew, options.useValues, unitData));
   crew.forEach( c => c.gp = this.calcCharGP( c ) );
   // ensure crew is the correct crew
@@ -809,8 +939,8 @@ StatCalculator.prototype.calcShipGP = function(ship, crew = [], options = {}) {
  */
 /********************************************************************************
  * Get stats for a customized roster or complete build for a character
- * @param (object) char - The unit data, see Line 1294 for needed object format
- * @param (object) useValues - The customizations to use for the units build, see Options on Line 1124
+ * @param (object) char - The unit data, see Line 1427 for needed object format
+ * @param (object) useValues - The customizations to use for the units build, see Options on Line 1257
  * @param (object) unitData - Unit data from the game
  * @return (object) unit - Object with new property values
 -------------------------------------------------------------------------------*/
@@ -847,7 +977,7 @@ function useValuesChar(char, useValues, unitData) {
  * Get stats for a customized roster or complete build for a ship
  * @param (object) ship - The ship data to use
  * @param (object) crew - The crew data to use
- * @param (object) useValues - The customizations to use for the unit's build, see Line 1124 for details
+ * @param (object) useValues - The customizations to use for the unit's build, see Line 1257 for details
  * @param (object) unitData - Unit data from the game
  * @return (Object) ship, crew - Ship and Crew objects with new property values
 ---------------------------------------------------------------------------------*/
@@ -955,7 +1085,7 @@ function calculateBaseStats(stats, level, baseID, unitData, crTables) {
  * Formats stats and adjusts for any options given 
  * @param (object) stats - Stats object
  * @param (integer) level - Units current level
- * @param (object) options - Options to modify functions, see Line 1124 for breakdown
+ * @param (object) options - Options to modify functions, see Line 1257 for breakdown
  * @returns (Object) stats - Array with formatted stats
  *
  * @options - scaled:true, unscaled: true, gameStyle: true, percentVals: true
@@ -1088,7 +1218,7 @@ function formatStats(stats, level, options) {
 /**********************************************************************************************
  * Rename object keys  for stats based on language option
  * @param (object) stats - stats object to adjust keys for
- * @param (object) options - Options used in this function, see Line 1124 for breakdown
+ * @param (object) options - Options used in this function, see Line 1257 for breakdown
  * @returns  - Stats object with renamed keys
  *
  * @options - language: {object}, noSpace: (true/false)
