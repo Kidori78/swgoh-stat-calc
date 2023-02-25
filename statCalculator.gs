@@ -1427,18 +1427,17 @@ function floor(value, digits = 0) {
 /*************************************************************************
  * Object Format
  *************************************************************************
- * Character Object for calcCharStats
+ * Character Object for calcCharStats and calcCharGP 
    { 
-     defId: <string>,     //base id
-     nameKey: <string>,   //unit name
-     rarity: <integer>,   //unit stars
-     level: <integer>,    //unit level
-     gear: <integer>,     //unit gear level
+     defId || definitionId: <string>,     //base id
+     rarity || currentRarity: <integer>,   //unit stars
+     level || currentLevel: <integer>,    //unit level
+     gear || currentTier: <integer>,     //unit gear level
      relic: { currentTier: <integer> }    // unit reliv level == 1=locked, 2=unlocked, 3=Level 1, 4=Level 2, etc.
-     combatType: <integer>,  // 1 for character, 2 for ship
-     equipped: [ {equipmentId: <gear id>} ] // Holds up to 6 pieces 1,3,5 left side of character gear; 2,4,6 right side on character gear
-     skills: [ { tier: <integer> , isZeta: <boolean>} ], 
-     mods: [ { 
+     combatType: <integer>,  // 1 for character, 2 for ship. This can be missing
+     equipped || equipment: [ {equipmentId: <gear id>} ] // Holds up to 6 pieces 1,3,5 left side of character gear; 2,4,6 right side on character gear
+     skills || skill: [ { tier: <integer> , isZeta: <boolean>} ],  //isZeta for useValues
+     mods || equippedStatMod: [ {  // layout below is for mods, equippedStatMod is the raw format used by Comlink
                pips: <integer>, 
                set: <integer>,
                level: <integer>,
@@ -1456,7 +1455,7 @@ function floor(value, digits = 0) {
           ..]
    }
  
- * Ship and Crew Object for .calcShipStats
+ * Ship and Crew Object for .calcShipStats and .calcShipGP
    - Ship
      {
        rarity: <integer>,
