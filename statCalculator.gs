@@ -3,8 +3,8 @@
 */
 /* 
  CREDITS: This class is a modified version of swgoh-stat-calc by Crinolo (https://github.com/Crinolo/swgoh-stat-calc)
- Options README at Line 1257
- Object Format README at Line 1427
+ Options README at end
+ Object Format README below Options README
 */
  /**
  * @Class StatCalculator
@@ -122,7 +122,7 @@ StatCalculator.prototype.setGameData = function(url=null) {
   }
   else {
     // Check backup url if first fails, this url can be replaced with your own if you are using a copy of the SWGoH Comlink for Github repo
-    apiResponse = UrlFetchApp.fetch('https://raw.githubusercontent.com/Kidori78/swgoh-comlink-for-github/main/data/gameData.json',parameters); 
+    apiResponse = UrlFetchApp.fetch('https://raw.githubusercontent.com/swgoh-utils/gamedata/main/gameData.json',parameters); 
     if (apiResponse.getResponseCode() === 200){
       gameData = JSON.parse(apiResponse.getContentText());
     }else{
@@ -252,31 +252,32 @@ StatCalculator.prototype.calcCharStats = function(char, options = {}) {
   if(options.language){
     if(options.language === "default"){ options.language = this.lang;}
   }
-  //Format raw data
-  if(!char.defId) { char["defId"] = char.definitionId.substring(0, char.definitionId.indexOf(":")); }
-  if(!char.level) { char["level"] = char.currentLevel; }
-  if(!char.rarity) { char["rarity"] = char.currentRarity; }
-  if(!char.gear) { char["gear"] = char.currentTier; }
-  if(!char.equipped) { char["equipped"] = char.equipment; }
-  if(!char.skills) { 
-      char["skills"] = char.skill;
-      char.skills.forEach(skill => {
-        skill.tier = skill.tier + 2;
-      });
-      if(char.skills.length !== unitData[char.defId].skills.length){
-        let skillList = [];
-        char.skills.forEach(sk => skillList[sk.id] = true );
-        unitData[ char.defId].skills.forEach(skill => {
-          if(!skillList[skill.id]) {
-            char.skills.push({id: skill.id, tier: 1 });
-          }
-        })
-      }
-  }
 
   try{
     if (options.useValues){
       char = useValuesChar(char, options.useValues, unitData);
+    } else {
+      //Format raw data
+      if(!char.defId) { char["defId"] = char.definitionId.substring(0, char.definitionId.indexOf(":")); }
+      if(!char.level) { char["level"] = char.currentLevel; }
+      if(!char.rarity) { char["rarity"] = char.currentRarity; }
+      if(!char.gear) { char["gear"] = char.currentTier; }
+      if(!char.equipped) { char["equipped"] = char.equipment; }
+      if(!char.skills) { 
+          char["skills"] = char.skill;
+          char.skills.forEach(skill => {
+            skill.tier = skill.tier + 2;
+          });
+          if(char.skills.length !== unitData[char.defId].skills.length){
+            let skillList = [];
+            char.skills.forEach(sk => skillList[sk.id] = true );
+            unitData[ char.defId].skills.forEach(skill => {
+              if(!skillList[skill.id]) {
+                char.skills.push({id: skill.id, tier: 1 });
+              }
+            })
+          }
+      }      
     }
     let stats = getCharRawStats(char);
     stats = calculateBaseStats(stats, char.level, char.defId, unitData, crTables);
@@ -520,50 +521,53 @@ StatCalculator.prototype.calcShipStats = function(ship, crew, options = {}) {
   if(options.language){
     if(options.language === "default"){ options.language = this.lang;}
   }
-  //Format raw data
-  if(!ship.defId) { ship["defId"] = ship.definitionId.substring(0, ship.definitionId.indexOf(":")); }
-  if(!ship.level) { ship["level"] = ship.currentLevel; }
-  if(!ship.rarity) { ship["rarity"] = ship.currentRarity; }
-  if(!ship.skills) { 
-      ship["skills"] = ship.skill;
-      ship.skills.forEach(skill => {
-        skill.tier = skill.tier + 2;
-      });
-      if(ship.skills.length !== unitData[ship.defId].skills.length){
-        let skillList = [];
-        ship.skills.forEach(sk => skillList[sk.id] = true );
-        unitData[ ship.defId].skills.forEach(skill => {
-          if(!skillList[skill.id]) {
-            ship.skills.push({id: skill.id, tier: 1 });
-          }
-        })
-      }
-  }
-  crew.forEach(char => {
-    if(!char.defId) { char["defId"] = char.definitionId.substring(0, char.definitionId.indexOf(":")); }
-    if(!char.level) { char["level"] = char.currentLevel; }
-    if(!char.rarity) { char["rarity"] = char.currentRarity; }
-    if(!char.gear) { char["gear"] = char.currentTier; }
-    if(!char.equipped) { char["equipped"] = char.equipment; }
-    if(!char.skills) { 
-      char["skills"] = char.skill;
-      char.skills.forEach(skill => {
-        skill.tier = skill.tier + 2;
-      });
-      if(char.skills.length !== unitData[char.defId].skills.length){
-        let skillList = [];
-        char.skills.forEach(sk => skillList[sk.id] = true );
-        unitData[ char.defId].skills.forEach(skill => {
-          if(!skillList[skill.id]) {
-            char.skills.push({id: skill.id, tier: 1 });
-          }
-        })
-      }
-    }
-  });
 
   try {
-    ({ship, crew} = useValuesShip(ship, crew, options.useValues, unitData));
+    if(options.useValues){
+      ({ship, crew} = useValuesShip(ship, crew, options.useValues, unitData));
+    }else {
+      //Format raw data
+      if(!ship.defId) { ship["defId"] = ship.definitionId.substring(0, ship.definitionId.indexOf(":")); }
+      if(!ship.level) { ship["level"] = ship.currentLevel; }
+      if(!ship.rarity) { ship["rarity"] = ship.currentRarity; }
+      if(!ship.skills) { 
+          ship["skills"] = ship.skill;
+          ship.skills.forEach(skill => {
+            skill.tier = skill.tier + 2;
+          });
+          if(ship.skills.length !== unitData[ship.defId].skills.length){
+            let skillList = [];
+            ship.skills.forEach(sk => skillList[sk.id] = true );
+            unitData[ ship.defId].skills.forEach(skill => {
+              if(!skillList[skill.id]) {
+                ship.skills.push({id: skill.id, tier: 1 });
+              }
+            })
+          }
+      }
+      crew.forEach(char => {
+        if(!char.defId) { char["defId"] = char.definitionId.substring(0, char.definitionId.indexOf(":")); }
+        if(!char.level) { char["level"] = char.currentLevel; }
+        if(!char.rarity) { char["rarity"] = char.currentRarity; }
+        if(!char.gear) { char["gear"] = char.currentTier; }
+        if(!char.equipped) { char["equipped"] = char.equipment; }
+        if(!char.skills) { 
+          char["skills"] = char.skill;
+          char.skills.forEach(skill => {
+            skill.tier = skill.tier + 2;
+          });
+          if(char.skills.length !== unitData[char.defId].skills.length){
+            let skillList = [];
+            char.skills.forEach(sk => skillList[sk.id] = true );
+            unitData[ char.defId].skills.forEach(skill => {
+              if(!skillList[skill.id]) {
+                char.skills.push({id: skill.id, tier: 1 });
+              }
+            })
+          }
+        }
+      });
+    }
     let stats = getShipRawStats(ship, crew);
     stats = calculateBaseStats(stats, ship.level, ship.defId, unitData, crTables);
     stats = formatStats(stats, ship.level, options);
